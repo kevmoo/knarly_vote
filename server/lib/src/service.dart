@@ -30,7 +30,10 @@ class VoteService {
         '''
 firebase.initializeApp(${jsonEncode(config.firebaseConfig())});
 ''',
-        headers: {'content-type': 'application/javascript'},
+        headers: {
+          'content-type': 'application/javascript',
+          'cache-control': 'public',
+        },
       );
 
   @Route.get('/api/elections/')

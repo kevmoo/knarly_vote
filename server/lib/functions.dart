@@ -22,12 +22,17 @@ Handler? _handler;
 
 Handler _middleware(Handler innerHandler) => (Request request) async {
       try {
-        final response = await innerHandler(request);
-        return response.change(
-          headers: {
-            'Cache-Control': 'no-store',
-          },
-        );
+        var response = await innerHandler(request);
+
+        if (!response.headers.containsKey('Cache-Control')) {
+          response = response.change(
+            headers: {
+              'Cache-Control': 'no-store',
+            },
+          );
+        }
+
+        return response;
       } on ServiceException catch (e) {
         final clientErrorStatusCode = e.clientErrorStatusCode;
         if (clientErrorStatusCode != null) {
