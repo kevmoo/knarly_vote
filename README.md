@@ -1,5 +1,9 @@
 [![Dart CI](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml/badge.svg)](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml)
 
+# Try it out
+
+Hosted at https://knarlyvote.com
+
 # Getting started and local development
 
 1. Copy `server/server_config.example.yaml` to `server/server_config.yaml` and
