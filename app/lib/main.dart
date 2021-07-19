@@ -1,12 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
 
 import 'src/auth_model.dart';
 import 'src/vote_widget.dart';
 
 Future<void> main() async {
-  //await Firebase.initializeApp();
+  setUrlStrategy(PathUrlStrategy());
   runApp(_KnarlyApp());
 }
 
