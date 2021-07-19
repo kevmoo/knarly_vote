@@ -1,0 +1,10 @@
+apiKey: ???
+projectId: ???
+electionUpdateTaskLocation: ???
+electionUpdateTaskQueueId: ???
+serviceAccountEmail: ???
+
+# remote task runner
+webHost: ???
+# local task runner
+#webHost: 'http://localhost:8080'
