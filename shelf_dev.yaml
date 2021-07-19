@@ -1,0 +1,10 @@
+# https://github.com/kevmoo/shelf_dev/
+
+web-app:
+  path: app
+  command: flutter run -d web-server  --web-port {PORT}
+
+web-server:
+  path: server
+  command: dart --enable-asserts bin/server.dart --port {PORT}
+  source: api

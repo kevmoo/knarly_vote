@@ -1,0 +1,13 @@
+# See https://github.com/google/mono_repo.dart for details on this file
+dart:
+- dev
+
+stages:
+- analyze_and_format:
+  - group:
+    - format
+    - analyze: --fatal-infos .
+#- unit_test:
+#  - test: -p chrome
+- ensure_build:
+  - test: --run-skipped -t presubmit-only test/ensure_build_test.dart

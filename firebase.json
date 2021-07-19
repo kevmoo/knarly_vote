@@ -1,0 +1,19 @@
+{
+  "hosting": {
+    "site": "knarly",
+    "public": "app/build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*"
+    ],
+    "rewrites": [
+      {
+        "source": "/api/**",
+        "run": {
+          "serviceId": "knarly-service",
+          "region": "us-central1"
+        }
+      }
+    ]
+  }
+}
