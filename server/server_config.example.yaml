@@ -1,3 +1,4 @@
+# See details in `lib/src/service_config.dart` for the needed values.
 apiKey: ???
 projectId: ???
 electionUpdateTaskLocation: ???
