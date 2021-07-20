@@ -10,7 +10,9 @@ import 'election_storage.dart';
 import 'service_config.dart';
 import 'vote_logic.dart';
 
-Future<FirestoreElectionStorage> create(ServiceConfig config) async {
+Future<FirestoreElectionStorage> createElectionStorage(
+  ServiceConfig config,
+) async {
   final client = await clientViaApplicationDefaultCredentials(
     scopes: [
       FirestoreApi.datastoreScope,
@@ -158,7 +160,6 @@ class FirestoreElectionStorage implements ElectionStorage {
         ),
         'projects/${config.projectId}/locations/${config.electionUpdateTaskLocation}/queues/${config.electionUpdateTaskQueueId}',
       );
-      print('task submitted!');
       print(prettyJson(resultTask));
     } else {
       final result = await _client.post(Uri.parse(updateUri));

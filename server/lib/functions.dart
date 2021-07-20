@@ -9,13 +9,17 @@ import 'src/service_exception.dart';
 @CloudFunction()
 Future<Response> function(Request request) async {
   final handler = _handler ??= _middleware.addHandler(
-    VoteService(
-      storage: await create(ServiceConfig.instance),
-      config: ServiceConfig.instance,
-    ).router,
+    (await _createVoteService()).router,
   );
 
   return handler(request);
+}
+
+Future<VoteService> _createVoteService() async {
+  final config = ServiceConfig.instance;
+  final storage = await createElectionStorage(config);
+
+  return VoteService(storage: storage, config: config);
 }
 
 Handler? _handler;

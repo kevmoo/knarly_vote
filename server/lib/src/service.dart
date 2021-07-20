@@ -142,7 +142,8 @@ firebase.initializeApp(${jsonEncode(config.firebaseConfig())});
     )
     // TODO: should be getting this from
     //  https://accounts.google.com/.well-known/openid-configuration
-    //  via jwks_uri – per docs somewhere
+    //  via jwks_uri – per https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
+    // Feature request for pkg:jose:https://github.com/appsup-dart/jose/issues/32
     ..addKeySetUrl(
       Uri.parse(
         'https://www.googleapis.com/oauth2/v3/certs',
