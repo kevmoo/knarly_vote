@@ -8,7 +8,7 @@ Future<void> main(List<String> args) async {
   final config = ServiceConfig.openConfig();
 
   final settings =
-      config.toJson().entries.map((e) => "${e.key}=${e.value}").join(',');
+      config.toJson().entries.map((e) => '${e.key}=${e.value}').join(',');
 
   final result = await Process.start(
     'gcloud',
