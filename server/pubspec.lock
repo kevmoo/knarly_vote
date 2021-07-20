@@ -14,14 +14,14 @@ packages:
       name: _fe_analyzer_shared
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "22.0.0"
+    version: "23.0.0"
   analyzer:
     dependency: transitive
     description:
       name: analyzer
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.7.2"
+    version: "2.0.0"
   args:
     dependency: "direct main"
     description:
@@ -275,12 +275,19 @@ packages:
     source: hosted
     version: "0.6.3"
   json_annotation:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: json_annotation
       url: "https://pub.dartlang.org"
     source: hosted
     version: "4.1.0"
+  json_serializable:
+    dependency: "direct dev"
+    description:
+      name: json_serializable
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "5.0.0"
   knarly_client:
     dependency: "direct main"
     description:
@@ -399,7 +406,7 @@ packages:
       name: shelf_router_generator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.0"
+    version: "1.0.1"
   shelf_web_socket:
     dependency: transitive
     description:
@@ -413,7 +420,7 @@ packages:
       name: source_gen
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.4"
   source_helper:
     dependency: transitive
     description:

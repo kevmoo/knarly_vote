@@ -1,7 +1,11 @@
 import 'dart:io';
 
+import 'package:json_annotation/json_annotation.dart';
 import 'package:yaml/yaml.dart';
 
+part 'service_config.g.dart';
+
+@JsonSerializable(anyMap: true, checked: true, disallowUnrecognizedKeys: true)
 class ServiceConfig {
   /// https://firebase.google.com/docs/projects/api-keys
   final String apiKey;
@@ -33,6 +37,8 @@ class ServiceConfig {
     required this.webHost,
   });
 
+  factory ServiceConfig.fromJson(Map json) => _$ServiceConfigFromJson(json);
+
   static late final ServiceConfig instance = _openConfig();
 
   Map<String, String> firebaseConfig() => {
@@ -46,29 +52,46 @@ class ServiceConfig {
         //'measurementId': '???',
       };
 
-  // TODO: get rid of hard-coded values.
+  Map<String, dynamic> toJson() => _$ServiceConfigToJson(this);
+
   static ServiceConfig _openConfig() {
+    final envValues = Map.fromEntries(
+      _configKeys.map((e) {
+        final value = Platform.environment[e];
+        return value == null ? null : MapEntry<String, String>(e, value);
+      }).whereType<MapEntry<String, String>>(),
+    );
+
+    if (envValues.length == _configKeys.length) {
+      return ServiceConfig.fromJson(envValues);
+    }
+
+    if (envValues.isNotEmpty) {
+      print('Only have some of the required environment variables.');
+      print('  We have: ${envValues.keys.join(',')}');
+      print('  Missing: ${_configKeys.difference(envValues.keys.toSet())}');
+      print('  Going to try to open the yaml file...');
+    }
+
+    return openConfig();
+  }
+
+  static ServiceConfig openConfig() {
     final file = File('server_config.yaml');
 
     final text = file.readAsStringSync();
 
-    final yaml = (loadYaml(text) as YamlMap).cast<String, String>();
+    final yaml = loadYaml(text) as YamlMap;
 
-    String val(String key) {
-      final value = yaml[key];
-      if (value == null) {
-        throw StateError('We do not have key "$key".');
-      }
-      return value;
-    }
-
-    return ServiceConfig(
-      apiKey: val('apiKey'),
-      projectId: val('projectId'),
-      electionUpdateTaskLocation: val('electionUpdateTaskLocation'),
-      electionUpdateTaskQueueId: val('electionUpdateTaskQueueId'),
-      serviceAccountEmail: val('serviceAccountEmail'),
-      webHost: val('webHost'),
-    );
+    return ServiceConfig.fromJson(yaml);
   }
 }
+
+const _configKeys = {
+  'apiKey',
+  'projectId',
+  'electionUpdateTaskLocation',
+  'electionUpdateTaskQueueId',
+  'serviceAccountEmail',
+  'webHost'
+};
