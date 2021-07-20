@@ -1,8 +1,18 @@
 [![Dart CI](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml/badge.svg)](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml)
 
+![Knarly Vote screen shot](docs/knarly_screen_shot_2021-07-20.png)
+
 # Try it out
 
 Hosted at https://knarlyvote.com
+
+# tl;dr
+
+A (work-in-progress) demonstration of: (1) a full-stack
+[Flutter](https://flutter.dev/) application utilizing
+[Firebase](https://firebase.google.com/) and
+[Google Cloud](https://cloud.google.com/), and (2) ranked voting with the
+[Condorcet Method](https://en.wikipedia.org/wiki/Condorcet_method).
 
 # Getting started and local development
 
@@ -26,8 +36,8 @@ _todo_ Sketching things out here, but this is incomplete at the moment.
 
    1. Enable cloud tasks and create a task queue.
    1. Enable cloud run.
-      1. Make sure the name of the service corresponds to the value
-         in `hosting/rewrites` in `firebase.json`.
+      1. Make sure the name of the service corresponds to the value in
+         `hosting/rewrites` in `firebase.json`.
    1. Set variables using `server/tool/update_cloud_run_environment.dart`.
    1. Deploy cloud run service
 
