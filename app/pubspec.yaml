@@ -28,6 +28,7 @@ dependencies:
     path: ../client
   provider: ^5.0.0
 
+  url_launcher: ^6.0.9
   vote: any
   vote_widgets: any
 

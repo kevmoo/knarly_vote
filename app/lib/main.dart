@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
 import 'src/vote_widget.dart';
@@ -11,17 +12,27 @@ Future<void> main() async {
   runApp(_KnarlyApp());
 }
 
+const _sourceUrl = 'github.com/kevmoo/knarly_vote';
+final _sourceUri = Uri.parse('https://$_sourceUrl');
+
 class _KnarlyApp extends StatelessWidget {
   static const _title = 'Knarly Vote';
-
-  _KnarlyApp();
 
   @override
   Widget build(BuildContext context) => MaterialApp(
         title: _title,
-        theme: ThemeData(),
         home: Scaffold(
-          appBar: AppBar(title: const Text(_title)),
+          appBar: AppBar(
+            title: const Text(_title),
+          ),
+          bottomNavigationBar: Link(
+            uri: _sourceUri,
+            target: LinkTarget.blank,
+            builder: (context, followLink) => ElevatedButton(
+              onPressed: followLink,
+              child: const Text('Source: $_sourceUrl'),
+            ),
+          ),
           body: ChangeNotifierProvider(
             create: (_) => FirebaseAuthModel(),
             child: Center(
