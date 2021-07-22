@@ -7,6 +7,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:knarly_client/knarly_client.dart';
 
 import 'election_storage.dart';
+import 'header_access_middleware.dart';
 import 'service_config.dart';
 import 'vote_logic.dart';
 
@@ -147,6 +148,8 @@ class FirestoreElectionStorage implements ElectionStorage {
     final updateUri = '${config.webHost}/api/elections/$electionId/update';
 
     if (updateUri.startsWith('https')) {
+      final traceParent = currentRequestHeaders!['traceparent'];
+
       final resultTask = await _tasks.projects.locations.queues.tasks.create(
         CreateTaskRequest(
           task: Task(
@@ -155,6 +158,8 @@ class FirestoreElectionStorage implements ElectionStorage {
               oidcToken: OidcToken(
                 serviceAccountEmail: config.serviceAccountEmail,
               ),
+              headers:
+                  traceParent == null ? null : {'traceparent': traceParent},
             ),
           ),
         ),
