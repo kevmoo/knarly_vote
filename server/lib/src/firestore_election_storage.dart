@@ -9,6 +9,7 @@ import 'package:knarly_client/knarly_client.dart';
 import 'election_storage.dart';
 import 'header_access_middleware.dart';
 import 'service_config.dart';
+import 'trace_context.dart';
 import 'vote_logic.dart';
 
 Future<FirestoreElectionStorage> createElectionStorage(
@@ -158,8 +159,12 @@ class FirestoreElectionStorage implements ElectionStorage {
               oidcToken: OidcToken(
                 serviceAccountEmail: config.serviceAccountEmail,
               ),
-              headers:
-                  traceParent == null ? null : {'traceparent': traceParent},
+              headers: traceParent == null
+                  ? null
+                  : {
+                      'traceparent':
+                          TraceContext.parse(traceParent).randomize().toString()
+                    },
             ),
           ),
         ),
