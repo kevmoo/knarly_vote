@@ -14,6 +14,9 @@ A (work-in-progress) demonstration of: (1) a full-stack
 [Google Cloud](https://cloud.google.com/), and (2) ranked voting with the
 [Condorcet Method](https://en.wikipedia.org/wiki/Condorcet_method).
 
+# Rough data flow
+
+![Data flow](docs/data_flow.png)
 # Getting started and local development
 
 1. Copy `server/server_config.example.yaml` to `server/server_config.yaml` and
