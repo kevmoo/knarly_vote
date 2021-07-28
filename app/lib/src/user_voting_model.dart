@@ -7,9 +7,10 @@ import 'package:http/http.dart';
 import 'package:knarly_common/knarly_common.dart';
 
 import 'election_result_model.dart';
+import 'network_exception.dart';
 import 'vote_model.dart';
 
-class ServerVoteModel extends ChangeNotifier {
+class UserVotingModel extends ChangeNotifier {
   final User _user;
   String? _firebaseIdToken;
   Election? _election;
@@ -17,23 +18,23 @@ class ServerVoteModel extends ChangeNotifier {
 
   ElectionResultModel? get electionResultModel => _electionResultModel;
 
-  ServerVoteModelState _state = ServerVoteModelState.justCreated;
+  UserVotingModelState _state = UserVotingModelState.justCreated;
 
   VoteModel<String>? _voteModel;
 
   bool _switchingStates = false;
 
-  ServerVoteModel(this._user) {
-    _switchState(ServerVoteModelState.requestingToken);
+  UserVotingModel(this._user) {
+    _switchState(UserVotingModelState.requestingToken);
   }
 
-  ServerVoteModelState get state => _state;
+  UserVotingModelState get state => _state;
 
   VoteModel<String>? get voteModel => _voteModel;
 
   String? get electionName => _election?.name;
 
-  void _switchState(ServerVoteModelState requestedState) {
+  void _switchState(UserVotingModelState requestedState) {
     assert(!_switchingStates);
     _switchingStates = true;
     try {
@@ -48,18 +49,18 @@ class ServerVoteModel extends ChangeNotifier {
       }
 
       switch (requestedState) {
-        case ServerVoteModelState.requestingToken:
-          assert(_state == ServerVoteModelState.justCreated);
+        case UserVotingModelState.requestingToken:
+          assert(_state == UserVotingModelState.justCreated);
 
           _runAsync(() async {
             _firebaseIdToken = await _user.getIdToken();
-            _switchState(ServerVoteModelState.requestingElections);
+            _switchState(UserVotingModelState.requestingElections);
           });
 
           break;
 
-        case ServerVoteModelState.requestingElections:
-          assert(_state == ServerVoteModelState.requestingToken);
+        case UserVotingModelState.requestingElections:
+          assert(_state == UserVotingModelState.requestingToken);
           assert(_firebaseIdToken != null);
 
           _runAsync(() async {
@@ -79,25 +80,25 @@ class ServerVoteModel extends ChangeNotifier {
 
             _election = Election.fromJson(json.first as Map<String, dynamic>);
             _electionResultModel = ElectionResultModel(_election!.id);
-            _switchState(ServerVoteModelState.updatingBallot);
+            _switchState(UserVotingModelState.updatingBallot);
           });
 
           break;
 
-        case ServerVoteModelState.updatingBallot:
+        case UserVotingModelState.updatingBallot:
           assert(
-            _state == ServerVoteModelState.requestingElections ||
-                _state == ServerVoteModelState.idle ||
-                _state == ServerVoteModelState.updatingBallot,
+            _state == UserVotingModelState.requestingElections ||
+                _state == UserVotingModelState.idle ||
+                _state == UserVotingModelState.updatingBallot,
           );
 
           _runAsync(_stateToUpdatingBallots);
           break;
-        case ServerVoteModelState.idle:
-          assert(_state == ServerVoteModelState.updatingBallot);
+        case UserVotingModelState.idle:
+          assert(_state == UserVotingModelState.updatingBallot);
           assert(_voteModel != null);
           break;
-        case ServerVoteModelState.error:
+        case UserVotingModelState.error:
           print('Reload the application, yo!');
           break;
         default:
@@ -116,7 +117,7 @@ class ServerVoteModel extends ChangeNotifier {
   }
 
   Future<void> _stateToUpdatingBallots() async {
-    assert(_state == ServerVoteModelState.updatingBallot);
+    assert(_state == UserVotingModelState.updatingBallot);
     final election = _election;
     if (election == null) {
       throw StateError('Election must not be null!');
@@ -159,11 +160,11 @@ class ServerVoteModel extends ChangeNotifier {
       )..addListener(_onVoteModelChanged);
     }
 
-    _switchState(ServerVoteModelState.idle);
+    _switchState(UserVotingModelState.idle);
   }
 
   void _onVoteModelChanged() {
-    _switchState(ServerVoteModelState.updatingBallot);
+    _switchState(UserVotingModelState.updatingBallot);
   }
 
   void _runAsync(FutureOr<void> Function() func) {
@@ -172,7 +173,7 @@ class ServerVoteModel extends ChangeNotifier {
         await func();
       } catch (error) {
         print('Error during state ${_state.name}');
-        _switchState(ServerVoteModelState.error);
+        _switchState(UserVotingModelState.error);
         rethrow;
       }
     });
@@ -190,23 +191,23 @@ class ServerVoteModel extends ChangeNotifier {
 }
 
 const _validTransitions = {
-  ServerVoteModelState.justCreated: {ServerVoteModelState.requestingToken},
-  ServerVoteModelState.requestingToken: {
-    ServerVoteModelState.requestingElections,
-    ServerVoteModelState.error,
+  UserVotingModelState.justCreated: {UserVotingModelState.requestingToken},
+  UserVotingModelState.requestingToken: {
+    UserVotingModelState.requestingElections,
+    UserVotingModelState.error,
   },
-  ServerVoteModelState.requestingElections: {
-    ServerVoteModelState.updatingBallot,
-    ServerVoteModelState.error,
+  UserVotingModelState.requestingElections: {
+    UserVotingModelState.updatingBallot,
+    UserVotingModelState.error,
   },
-  ServerVoteModelState.updatingBallot: {
-    ServerVoteModelState.idle,
-    ServerVoteModelState.error,
+  UserVotingModelState.updatingBallot: {
+    UserVotingModelState.idle,
+    UserVotingModelState.error,
   },
-  ServerVoteModelState.idle: {ServerVoteModelState.updatingBallot},
+  UserVotingModelState.idle: {UserVotingModelState.updatingBallot},
 };
 
-enum ServerVoteModelState {
+enum UserVotingModelState {
   justCreated,
   requestingToken,
   requestingElections,
@@ -215,20 +216,6 @@ enum ServerVoteModelState {
   error,
 }
 
-extension ServerVoteModelStateExtension on ServerVoteModelState {
+extension UserVotingModelStateExtension on UserVotingModelState {
   String get name => toString().split('.').last;
-}
-
-class NetworkException implements Exception {
-  final String message;
-  final Uri? uri;
-  final int statusCode;
-
-  NetworkException(this.message, {required this.statusCode, this.uri});
-
-  @override
-  String toString() => [
-        'NetworkException: ($statusCode) $message',
-        if (uri != null) '($uri)',
-      ].join(' ');
 }

@@ -35,9 +35,6 @@ class Election {
 
   // state: draft, open, closed
 
-  // ** Nested Collections **
-  // ballots: stream?
-
   // ** Data validation **
 
   // TODO: allowed twitter users?

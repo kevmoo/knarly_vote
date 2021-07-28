@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:vote_widgets/vote_widgets.dart';
 
 import 'election_result_model.dart';
-import 'server_vote_model.dart';
+import 'user_voting_model.dart';
 import 'vote_model.dart';
 
 class VoteWidget extends StatelessWidget {
@@ -14,8 +14,8 @@ class VoteWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (_) => ServerVoteModel(_user),
-        child: Consumer<ServerVoteModel>(
+        create: (_) => UserVotingModel(_user),
+        child: Consumer<UserVotingModel>(
           builder: (context, model, __) {
             final electionName = model.electionName;
             final voteModel = model.voteModel;
@@ -28,7 +28,7 @@ class VoteWidget extends StatelessWidget {
                   'State: ${model.state.name}',
                   style: const TextStyle(fontStyle: FontStyle.italic),
                 ),
-                if (model.state == ServerVoteModelState.error)
+                if (model.state == UserVotingModelState.error)
                   const Padding(
                     padding: EdgeInsets.all(8.0),
                     child: Text(
