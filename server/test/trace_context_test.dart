@@ -1,4 +1,4 @@
-import 'package:server/src/trace_context.dart';
+import 'package:knarly_server/src/trace_context.dart';
 import 'package:test/test.dart';
 
 void main() {

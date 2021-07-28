@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:server/src/service_config.dart';
+import 'package:knarly_server/src/service_config.dart';
 
 Future<void> main(List<String> args) async {
   final serviceName = args.single;
