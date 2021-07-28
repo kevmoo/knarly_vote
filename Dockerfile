@@ -5,8 +5,8 @@ FROM dart:stable AS build
 WORKDIR /shelf_jwt_auth
 COPY shelf_jwt_auth/ .
 
-WORKDIR /client
-COPY client/ .
+WORKDIR /common
+COPY common/ .
 
 # Resolve app dependencies.
 WORKDIR /server
