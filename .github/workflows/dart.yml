@@ -1,4 +1,4 @@
-# Created with package:mono_repo v5.0.0
+# Created with package:mono_repo v5.0.1
 name: Dart CI
 on:
   push:
@@ -27,46 +27,46 @@ jobs:
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.0
+      - uses: dart-lang/setup-dart@v1.1
         with:
           sdk: stable
       - id: checkout
         uses: actions/checkout@v2.3.4
       - name: mono_repo self validate
-        run: dart pub global activate mono_repo 5.0.0
+        run: dart pub global activate mono_repo 5.0.1
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
   job_002:
-    name: "analyze_and_format; PKGS: client, server, shelf_jwt_auth; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
+    name: "analyze_and_format; PKGS: common, server, shelf_jwt_auth; `dart format --output=none --set-exit-if-changed .`, `dart analyze --fatal-infos .`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:client-server-shelf_jwt_auth;commands:format-analyze"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:common-server-shelf_jwt_auth;commands:format-analyze"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:client-server-shelf_jwt_auth
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:common-server-shelf_jwt_auth
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.0
+      - uses: dart-lang/setup-dart@v1.1
         with:
           sdk: dev
       - id: checkout
         uses: actions/checkout@v2.3.4
-      - id: client_pub_upgrade
-        name: client; dart pub upgrade
+      - id: common_pub_upgrade
+        name: common; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: client
+        working-directory: common
         run: dart pub upgrade
-      - name: "client; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.client_pub_upgrade.conclusion == 'success'"
-        working-directory: client
+      - name: "common; dart format --output=none --set-exit-if-changed ."
+        if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
+        working-directory: common
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "client; dart analyze --fatal-infos ."
-        if: "always() && steps.client_pub_upgrade.conclusion == 'success'"
-        working-directory: client
+      - name: "common; dart analyze --fatal-infos ."
+        if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
+        working-directory: common
         run: dart analyze --fatal-infos .
       - id: server_pub_upgrade
         name: server; dart pub upgrade
@@ -95,32 +95,32 @@ jobs:
         working-directory: shelf_jwt_auth
         run: dart analyze --fatal-infos .
   job_003:
-    name: "ensure_build; PKG: client; `dart test --run-skipped -t presubmit-only test/ensure_build_test.dart`"
+    name: "ensure_build; PKG: common; `dart test --run-skipped -t presubmit-only test/ensure_build_test.dart`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
         uses: actions/cache@v2.1.6
         with:
           path: "~/.pub-cache/hosted"
-          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:client;commands:test"
+          key: "os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:common;commands:test"
           restore-keys: |
-            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:client
+            os:ubuntu-latest;pub-cache-hosted;dart:dev;packages:common
             os:ubuntu-latest;pub-cache-hosted;dart:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@v1.0
+      - uses: dart-lang/setup-dart@v1.1
         with:
           sdk: dev
       - id: checkout
         uses: actions/checkout@v2.3.4
-      - id: client_pub_upgrade
-        name: client; dart pub upgrade
+      - id: common_pub_upgrade
+        name: common; dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
-        working-directory: client
+        working-directory: common
         run: dart pub upgrade
-      - name: "client; dart test --run-skipped -t presubmit-only test/ensure_build_test.dart"
-        if: "always() && steps.client_pub_upgrade.conclusion == 'success'"
-        working-directory: client
+      - name: "common; dart test --run-skipped -t presubmit-only test/ensure_build_test.dart"
+        if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
+        working-directory: common
         run: dart test --run-skipped -t presubmit-only test/ensure_build_test.dart
     needs:
       - job_001
