@@ -243,6 +243,11 @@ extension ValueExtention on Value {
     if (arrayValue != null) {
       return arrayValue!.values?.map((e) => e.literal).toList() ?? [];
     }
+
+    if (nullValue != null) {
+      return null;
+    }
+
     throw UnimplementedError(toJson().toString());
   }
 }
