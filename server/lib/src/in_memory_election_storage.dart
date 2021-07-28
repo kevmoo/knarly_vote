@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:knarly_client/knarly_client.dart';
+import 'package:knarly_common/knarly_common.dart';
 
 import 'election_storage.dart';
 import 'service_exception.dart';

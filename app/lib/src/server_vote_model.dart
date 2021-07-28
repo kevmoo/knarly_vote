@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
-import 'package:knarly_client/knarly_client.dart';
+import 'package:knarly_common/knarly_common.dart';
 
 import 'election_result_model.dart';
 import 'vote_model.dart';

@@ -4,7 +4,7 @@ import 'dart:convert';
 import 'package:googleapis/cloudtasks/v2.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
-import 'package:knarly_client/knarly_client.dart';
+import 'package:knarly_common/knarly_common.dart';
 
 import 'election_storage.dart';
 import 'header_access_middleware.dart';

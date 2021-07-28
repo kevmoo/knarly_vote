@@ -11,8 +11,8 @@ dependencies:
   http: ^0.13.3
   jose: ^0.3.0
   json_annotation: ^4.1.0
-  knarly_client:
-    path: ../client
+  knarly_common:
+    path: ../common
   shelf: ^1.2.0
   shelf_jwt_auth:
     path: ../shelf_jwt_auth

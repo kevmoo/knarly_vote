@@ -1,4 +1,4 @@
-import 'package:knarly_client/knarly_client.dart';
+import 'package:knarly_common/knarly_common.dart';
 import 'package:vote/vote.dart' as vote;
 
 Object getVoteJson(Election election, List<Ballot> ballots) {
