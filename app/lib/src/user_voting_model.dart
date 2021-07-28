@@ -3,16 +3,17 @@ import 'dart:convert';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
-import 'package:http/http.dart';
 import 'package:knarly_common/knarly_common.dart';
 
+import 'authenticated_user_mixin.dart';
 import 'election_result_model.dart';
 import 'network_exception.dart';
 import 'vote_model.dart';
 
-class UserVotingModel extends ChangeNotifier {
-  final User _user;
-  String? _firebaseIdToken;
+class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
+  @override
+  final User user;
+
   Election? _election;
   ElectionResultModel? _electionResultModel;
 
@@ -24,8 +25,8 @@ class UserVotingModel extends ChangeNotifier {
 
   bool _switchingStates = false;
 
-  UserVotingModel(this._user) {
-    _switchState(UserVotingModelState.requestingToken);
+  UserVotingModel(this.user) {
+    _switchState(UserVotingModelState.requestingElections);
   }
 
   UserVotingModelState get state => _state;
@@ -49,23 +50,12 @@ class UserVotingModel extends ChangeNotifier {
       }
 
       switch (requestedState) {
-        case UserVotingModelState.requestingToken:
+        case UserVotingModelState.requestingElections:
           assert(_state == UserVotingModelState.justCreated);
 
           _runAsync(() async {
-            _firebaseIdToken = await _user.getIdToken();
-            _switchState(UserVotingModelState.requestingElections);
-          });
-
-          break;
-
-        case UserVotingModelState.requestingElections:
-          assert(_state == UserVotingModelState.requestingToken);
-          assert(_firebaseIdToken != null);
-
-          _runAsync(() async {
             final uri = Uri.parse('api/elections/');
-            final response = await get(uri, headers: _requestHeaders);
+            final response = await get(uri);
             if (response.statusCode != 200) {
               throw NetworkException(
                   'Bad response from service! ${response.statusCode}. '
@@ -128,12 +118,11 @@ class UserVotingModel extends ChangeNotifier {
     final newRank = _voteModel?.rank.toList();
 
     final response = newRank == null
-        ? await get(uri, headers: _requestHeaders)
+        ? await get(uri)
         : await put(
             uri,
             headers: {
               'Content-Type': 'application/json',
-              ..._requestHeaders,
             },
             body: jsonEncode(newRank),
           );
@@ -185,17 +174,10 @@ class UserVotingModel extends ChangeNotifier {
     _voteModel?.dispose();
     super.dispose();
   }
-
-  Map<String, String> get _requestHeaders =>
-      {'Authorization': 'Bearer ${_firebaseIdToken!}'};
 }
 
 const _validTransitions = {
-  UserVotingModelState.justCreated: {UserVotingModelState.requestingToken},
-  UserVotingModelState.requestingToken: {
-    UserVotingModelState.requestingElections,
-    UserVotingModelState.error,
-  },
+  UserVotingModelState.justCreated: {UserVotingModelState.requestingElections},
   UserVotingModelState.requestingElections: {
     UserVotingModelState.updatingBallot,
     UserVotingModelState.error,
@@ -209,7 +191,6 @@ const _validTransitions = {
 
 enum UserVotingModelState {
   justCreated,
-  requestingToken,
   requestingElections,
   idle,
   updatingBallot,
