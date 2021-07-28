@@ -41,7 +41,7 @@ class FirestoreElectionStorage implements ElectionStorage {
   Future<List<Election>> listElection(String userId) async {
     final result = await _documents.list(
       _documentsPath,
-      'elections',
+      rootCollectionName,
     );
 
     return result.documents!.map((d) => d.toElection()).toList();
@@ -51,7 +51,7 @@ class FirestoreElectionStorage implements ElectionStorage {
   Future<Ballot> getBallot(String userId, String electionId) async {
     try {
       final document = await _documents.get(
-        '$_documentsPath/elections/$electionId/ballots/$userId',
+        _ballotPath(electionId, userId),
       );
 
       return document.toBallot();
@@ -73,15 +73,13 @@ class FirestoreElectionStorage implements ElectionStorage {
 
     if (rank.isEmpty) {
       // If the rank is empty, just delete the ballot – not needed!
-      await _documents.delete(
-        '$_documentsPath/elections/$electionId/ballots/$userId',
-      );
+      await _documents.delete(_ballotPath(electionId, userId));
 
       ballot = Ballot([]);
     } else {
       final document = await _documents.patch(
         Document(fields: {'rank': valueFromLiteral(rank)}),
-        '$_documentsPath/elections/$electionId/ballots/$userId',
+        _ballotPath(electionId, userId),
       );
 
       ballot = document.toBallot();
@@ -94,7 +92,7 @@ class FirestoreElectionStorage implements ElectionStorage {
   Future<void> updateElection(String electionId) async {
     // download the election doc
     final electionDoc = await _documents.get(
-      '$_documentsPath/elections/$electionId',
+      _electionDocumentPath(electionId),
     );
 
     final election = electionDoc.toElection();
@@ -110,7 +108,7 @@ class FirestoreElectionStorage implements ElectionStorage {
     String? nextPageToken;
     do {
       final ballotList = await _documents.list(
-        '$_documentsPath/elections/$electionId',
+        _electionDocumentPath(electionId),
         'ballots',
         pageToken: nextPageToken,
         transaction: transaction.transaction,
@@ -184,6 +182,12 @@ class FirestoreElectionStorage implements ElectionStorage {
   String get _databaseId => 'projects/${config.projectId}/databases/(default)';
 
   String get _documentsPath => '$_databaseId/documents';
+
+  String _electionDocumentPath(String electionId) =>
+      '$_documentsPath/${electionDocumentPath(electionId)}';
+
+  String _ballotPath(String electionId, String userId) =>
+      '${_electionDocumentPath(electionId)}/ballots/$userId';
 
   ProjectsDatabasesDocumentsResource get _documents =>
       _firestore.projects.databases.documents;

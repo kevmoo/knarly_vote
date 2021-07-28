@@ -1,4 +1,9 @@
 export 'src/election.dart';
 
+const rootCollectionName = 'elections';
+
+String electionDocumentPath(String electionId) =>
+    '$rootCollectionName/$electionId';
+
 String electionResultPath(String electionId) =>
-    'elections/$electionId/results/condorcet';
+    '${electionDocumentPath(electionId)}/results/condorcet';
