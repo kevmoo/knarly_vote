@@ -20,7 +20,7 @@ void main() {
   test(
     'ensure_build',
     () => expectBuildClean(
-      packageRelativeDirectory: 'client',
+      packageRelativeDirectory: 'common',
     ),
   );
 }
