@@ -85,7 +85,11 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
           _runAsync(_stateToUpdatingBallots);
           break;
         case UserVotingModelState.idle:
-          assert(_state == UserVotingModelState.updatingBallot);
+          assert(
+            _state == UserVotingModelState.updatingBallot ||
+                _state == UserVotingModelState.idle,
+            'The state is $_state',
+          );
           assert(_voteModel != null);
           break;
         case UserVotingModelState.error:
@@ -106,8 +110,10 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
     }
   }
 
+  int _stackedUpdateBallotsCount = 0;
+
   Future<void> _stateToUpdatingBallots() async {
-    assert(_state == UserVotingModelState.updatingBallot);
+    assert(_state == UserVotingModelState.updatingBallot, '_state is $_state');
     final election = _election;
     if (election == null) {
       throw StateError('Election must not be null!');
@@ -117,39 +123,48 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
     final newRank = _voteModel?.rank.toList();
 
-    final response = newRank == null
-        ? await get(uri)
-        : await put(
-            uri,
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: jsonEncode(newRank),
-          );
-    if (response.statusCode != 200) {
-      throw NetworkException(
-        'Bad response from service! ${response.statusCode}. '
-        '${response.body}',
-        statusCode: response.statusCode,
-        uri: uri,
-      );
-    }
-    final json = jsonDecode(response.body) as Map<String, dynamic>;
-    final ballot = Ballot.fromJson(json);
-
-    final currentModel = _voteModel;
-
-    if (currentModel == null || !listEquals(currentModel.rank, ballot.rank)) {
-      if (currentModel != null) {
-        currentModel.removeListener(_onVoteModelChanged);
+    _stackedUpdateBallotsCount++;
+    try {
+      final response = newRank == null
+          ? await get(uri)
+          : await put(
+              uri,
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: jsonEncode(newRank),
+            );
+      if (_stackedUpdateBallotsCount > 1) {
+        // Only want to update "the world" if this is the last update to go
+        // through – otherwise we have timing issues!
+        return;
       }
-      _voteModel = VoteModel(
-        election.candidates,
-        ballot.rank,
-      )..addListener(_onVoteModelChanged);
-    }
+      if (response.statusCode != 200) {
+        throw NetworkException(
+          'Bad response from service! ${response.statusCode}. '
+          '${response.body}',
+          statusCode: response.statusCode,
+          uri: uri,
+        );
+      }
+      final json = jsonDecode(response.body) as Map<String, dynamic>;
+      final ballot = Ballot.fromJson(json);
 
-    _switchState(UserVotingModelState.idle);
+      final currentModel = _voteModel;
+
+      if (currentModel == null || !listEquals(currentModel.rank, ballot.rank)) {
+        if (currentModel != null) {
+          currentModel.removeListener(_onVoteModelChanged);
+        }
+        _voteModel = VoteModel(
+          election.candidates,
+          ballot.rank,
+        )..addListener(_onVoteModelChanged);
+      }
+      _switchState(UserVotingModelState.idle);
+    } finally {
+      _stackedUpdateBallotsCount--;
+    }
   }
 
   void _onVoteModelChanged() {
@@ -177,16 +192,22 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 }
 
 const _validTransitions = {
-  UserVotingModelState.justCreated: {UserVotingModelState.requestingElections},
+  UserVotingModelState.justCreated: {
+    UserVotingModelState.requestingElections,
+  },
   UserVotingModelState.requestingElections: {
-    UserVotingModelState.updatingBallot,
     UserVotingModelState.error,
+    UserVotingModelState.updatingBallot,
   },
   UserVotingModelState.updatingBallot: {
-    UserVotingModelState.idle,
     UserVotingModelState.error,
+    UserVotingModelState.idle,
+    UserVotingModelState.updatingBallot,
   },
-  UserVotingModelState.idle: {UserVotingModelState.updatingBallot},
+  UserVotingModelState.idle: {
+    UserVotingModelState.error,
+    UserVotingModelState.updatingBallot,
+  },
 };
 
 enum UserVotingModelState {
