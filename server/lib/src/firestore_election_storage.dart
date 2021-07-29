@@ -56,7 +56,7 @@ class FirestoreElectionStorage implements ElectionStorage {
 
       return document.toBallot();
     } on DetailedApiRequestError catch (e) {
-      if (e.jsonResponse?['error']?['code'] == 404) {
+      if ((e.jsonResponse?['error'] as Map<String, dynamic>?)?['code'] == 404) {
         return Ballot([]);
       }
       rethrow;

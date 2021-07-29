@@ -56,7 +56,8 @@ class _KnarlyApp extends StatelessWidget {
                                 ElevatedButton(
                                   onPressed: _onSignIn,
                                   child: const Text(
-                                      'Sign in with your Google account'),
+                                    'Sign in with your Google account',
+                                  ),
                                 ),
                               if (user != null) ...[
                                 Padding(

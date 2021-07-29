@@ -14,10 +14,11 @@ Future<Election> downloadFirstElection(User user) async {
   final response = await get(uri, headers: authHeaders(firebaseIdToken));
   if (response.statusCode != 200) {
     throw NetworkException(
-        'Bad response from service! ${response.statusCode}. '
-        '${response.body}',
-        statusCode: response.statusCode,
-        uri: uri);
+      'Bad response from service! ${response.statusCode}. '
+      '${response.body}',
+      statusCode: response.statusCode,
+      uri: uri,
+    );
   }
   final json = jsonDecode(response.body) as List;
   if (json.isEmpty) {
