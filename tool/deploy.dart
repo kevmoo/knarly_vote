@@ -10,14 +10,5 @@ Future<void> main() async {
     mode: ProcessStartMode.inheritStdio,
   );
 
-  final exit = await proc.exitCode;
-  if (exit != 0) {
-    return;
-  }
-
-  await Process.start(
-    'firebase',
-    ['deploy'],
-    mode: ProcessStartMode.inheritStdio,
-  );
+  exitCode = await proc.exitCode;
 }

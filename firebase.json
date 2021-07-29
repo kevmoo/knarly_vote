@@ -1,5 +1,6 @@
 {
   "hosting": {
+    "predeploy": "./tool/deploy.dart",
     "site": "knarly",
     "public": "app/build/web",
     "ignore": [
