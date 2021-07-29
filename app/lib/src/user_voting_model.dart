@@ -11,13 +11,12 @@ import 'network_exception.dart';
 import 'vote_model.dart';
 
 class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
+  final User _user;
+  final Election _election;
+  final ElectionResultModel electionResultModel;
+
   @override
-  final User user;
-
-  Election? _election;
-  ElectionResultModel? _electionResultModel;
-
-  ElectionResultModel? get electionResultModel => _electionResultModel;
+  Future<String> requestBearerToken() => _user.getIdToken();
 
   UserVotingModelState _state = UserVotingModelState.justCreated;
 
@@ -25,15 +24,16 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
   bool _switchingStates = false;
 
-  UserVotingModel(this.user) {
-    _switchState(UserVotingModelState.requestingElections);
+  UserVotingModel(this._user, this._election)
+      : electionResultModel = ElectionResultModel(_election.id) {
+    _switchState(UserVotingModelState.updatingBallot);
   }
 
   UserVotingModelState get state => _state;
 
   VoteModel<String>? get voteModel => _voteModel;
 
-  String? get electionName => _election?.name;
+  String get electionName => _election.name;
 
   void _switchState(UserVotingModelState requestedState) {
     assert(!_switchingStates);
@@ -50,34 +50,9 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
       }
 
       switch (requestedState) {
-        case UserVotingModelState.requestingElections:
-          assert(_state == UserVotingModelState.justCreated);
-
-          _runAsync(() async {
-            final uri = Uri.parse('api/elections/');
-            final response = await get(uri);
-            if (response.statusCode != 200) {
-              throw NetworkException(
-                  'Bad response from service! ${response.statusCode}. '
-                  '${response.body}',
-                  statusCode: response.statusCode,
-                  uri: uri);
-            }
-            final json = jsonDecode(response.body) as List;
-            if (json.isEmpty) {
-              throw StateError('No values returned!');
-            }
-
-            _election = Election.fromJson(json.first as Map<String, dynamic>);
-            _electionResultModel = ElectionResultModel(_election!.id);
-            _switchState(UserVotingModelState.updatingBallot);
-          });
-
-          break;
-
         case UserVotingModelState.updatingBallot:
           assert(
-            _state == UserVotingModelState.requestingElections ||
+            _state == UserVotingModelState.justCreated ||
                 _state == UserVotingModelState.idle ||
                 _state == UserVotingModelState.updatingBallot,
           );
@@ -114,12 +89,8 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
   Future<void> _stateToUpdatingBallots() async {
     assert(_state == UserVotingModelState.updatingBallot, '_state is $_state');
-    final election = _election;
-    if (election == null) {
-      throw StateError('Election must not be null!');
-    }
 
-    final uri = Uri.parse('api/ballots/${election.id}/');
+    final uri = Uri.parse('api/ballots/${_election.id}/');
 
     final newRank = _voteModel?.rank.toList();
 
@@ -157,7 +128,7 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
           currentModel.removeListener(_onVoteModelChanged);
         }
         _voteModel = VoteModel(
-          election.candidates,
+          _election.candidates,
           ballot.rank,
         )..addListener(_onVoteModelChanged);
       }
@@ -193,10 +164,6 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
 const _validTransitions = {
   UserVotingModelState.justCreated: {
-    UserVotingModelState.requestingElections,
-  },
-  UserVotingModelState.requestingElections: {
-    UserVotingModelState.error,
     UserVotingModelState.updatingBallot,
   },
   UserVotingModelState.updatingBallot: {
@@ -212,7 +179,6 @@ const _validTransitions = {
 
 enum UserVotingModelState {
   justCreated,
-  requestingElections,
   idle,
   updatingBallot,
   error,

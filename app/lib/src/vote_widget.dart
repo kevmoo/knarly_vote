@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:knarly_common/knarly_common.dart';
 import 'package:provider/provider.dart';
 import 'package:vote_widgets/vote_widgets.dart';
 
@@ -9,18 +10,17 @@ import 'vote_model.dart';
 
 class VoteWidget extends StatelessWidget {
   final User _user;
+  final Election _data;
 
-  VoteWidget(this._user);
+  VoteWidget(this._user, this._data);
 
   @override
   Widget build(BuildContext context) => ChangeNotifierProvider(
-        create: (_) => UserVotingModel(_user),
+        create: (_) => UserVotingModel(_user, _data),
         child: Consumer<UserVotingModel>(
           builder: (context, model, __) {
-            final electionName = model.electionName;
-            final voteModel = model.voteModel;
-
             final electionModel = model.electionResultModel;
+            final voteModel = model.voteModel;
 
             return Column(
               children: [
@@ -39,39 +39,37 @@ class VoteWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                if (electionName != null)
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      electionName,
-                      textScaleFactor: 2,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    model.electionName,
+                    textScaleFactor: 2,
                   ),
-                if (electionModel != null)
-                  ChangeNotifierProvider.value(
-                    value: electionModel,
-                    child: Consumer<ElectionResultModel>(
-                      builder: (_, model, __) {
-                        final result = model.value;
-                        if (result == null) {
-                          return const Text(
-                            'Waiting for result to be calculated...',
-                          );
-                        }
-                        final ballotCount = electionModel.ballotCount;
-                        return Column(
-                          children: [
-                            if (ballotCount != null)
-                              Text(
-                                'All cast ballots: $ballotCount',
-                                textScaleFactor: 1.5,
-                              ),
-                            CondorcetElectionResultWidget(result),
-                          ],
+                ),
+                ChangeNotifierProvider.value(
+                  value: electionModel,
+                  child: Consumer<ElectionResultModel>(
+                    builder: (_, model, __) {
+                      final result = model.value;
+                      if (result == null) {
+                        return const Text(
+                          'Waiting for result to be calculated...',
                         );
-                      },
-                    ),
+                      }
+                      final ballotCount = electionModel.ballotCount;
+                      return Column(
+                        children: [
+                          if (ballotCount != null)
+                            Text(
+                              'All cast ballots: $ballotCount',
+                              textScaleFactor: 1.5,
+                            ),
+                          CondorcetElectionResultWidget(result),
+                        ],
+                      );
+                    },
                   ),
+                ),
                 if (voteModel != null)
                   Expanded(
                     child: Padding(

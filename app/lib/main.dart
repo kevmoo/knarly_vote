@@ -1,10 +1,12 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
+import 'package:knarly_common/knarly_common.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
+import 'src/temp.dart';
 import 'src/vote_widget.dart';
 
 Future<void> main() async {
@@ -71,9 +73,7 @@ class _KnarlyApp extends StatelessWidget {
                             ],
                           ),
                         ),
-                        Expanded(
-                          child: user == null ? Container() : VoteWidget(user),
-                        ),
+                        Expanded(child: _withUser(user)),
                       ],
                     );
                   },
@@ -101,3 +101,26 @@ class _KnarlyApp extends StatelessWidget {
     }
   }
 }
+
+Widget _withUser(User? user) => user == null
+    ? const Center(child: Text('Must sign in...'))
+    : FutureBuilder<Election>(
+        future: downloadFirstElection(user),
+        builder: (buildContext, snapshot) {
+          if (snapshot.hasError) {
+            // TODO: Probably could do something a bit better here...
+            return Center(
+              child: Text(
+                snapshot.error.toString(),
+                style: const TextStyle(color: Colors.red),
+              ),
+            );
+          }
+
+          if (snapshot.hasData) {
+            return VoteWidget(user, snapshot.requireData);
+          }
+
+          return const Center(child: Text('Downloading election...'));
+        },
+      );

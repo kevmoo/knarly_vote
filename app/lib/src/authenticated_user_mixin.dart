@@ -1,12 +1,13 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/browser_client.dart';
 import 'package:http/http.dart';
 
+import 'shared.dart';
+
 mixin AuthenticatedUserMixin on ChangeNotifier {
   final _client = BrowserClient();
 
-  User get user;
+  Future<String> requestBearerToken();
 
   Future<Response> get(Uri url, {Map<String, String>? headers}) async =>
       _client.get(
@@ -33,10 +34,10 @@ mixin AuthenticatedUserMixin on ChangeNotifier {
 
   Future<Map<String, String>> _headers(Map<String, String>? headers) async {
     assert(headers == null || !headers.containsKey('Authorization'));
-    final firebaseIdToken = await user.getIdToken();
+    final firebaseIdToken = await requestBearerToken();
 
     return {
-      'Authorization': 'Bearer $firebaseIdToken',
+      ...authHeaders(firebaseIdToken),
       ...?headers,
     };
   }
