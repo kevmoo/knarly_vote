@@ -16,7 +16,7 @@ class PlaceData {
   Map<String, dynamic> toJson() => _$PlaceDataToJson(this);
 }
 
-@JsonSerializable()
+@JsonSerializable(includeIfNull: false)
 class Election {
   // TODO: id MUST be a valid URI component
   final String id;
@@ -28,7 +28,7 @@ class Election {
   // min/max length, etc
   final String name;
 
-  // * description
+  final String? description;
 
   // candidates (String list of allowed values)
   final Set<String> candidates;
@@ -44,6 +44,7 @@ class Election {
     required this.id,
     required this.name,
     required Set<String> candidates,
+    this.description,
   }) : candidates = Set.unmodifiable(
           candidates.toList()..sort(compareAsciiLowerCaseNatural),
         ) {

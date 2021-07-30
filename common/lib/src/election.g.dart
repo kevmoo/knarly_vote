@@ -21,13 +21,25 @@ Election _$ElectionFromJson(Map<String, dynamic> json) => Election(
       name: json['name'] as String,
       candidates:
           (json['candidates'] as List<dynamic>).map((e) => e as String).toSet(),
+      description: json['description'] as String?,
     );
 
-Map<String, dynamic> _$ElectionToJson(Election instance) => <String, dynamic>{
-      'id': instance.id,
-      'name': instance.name,
-      'candidates': instance.candidates.toList(),
-    };
+Map<String, dynamic> _$ElectionToJson(Election instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'name': instance.name,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('description', instance.description);
+  val['candidates'] = instance.candidates.toList();
+  return val;
+}
 
 Ballot _$BallotFromJson(Map<String, dynamic> json) => Ballot(
       (json['rank'] as List<dynamic>).map((e) => e as String).toList(),
