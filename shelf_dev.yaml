@@ -2,7 +2,7 @@
 
 web-app:
   path: app
-  command: flutter run -d web-server  --web-port {PORT}
+  command: flutter run -d web-server --web-port {PORT}
 
 web-server:
   path: server
