@@ -130,6 +130,7 @@ Widget _sortedListHeader(String title) => Text(
 Widget rankList(VoteModel<String> model, Iterable<String> items) =>
     ReorderableListView(
       padding: _listViewPadding,
+      onReorder: model.reorderVotes,
       children: [
         for (var item in items)
           GestureDetector(
@@ -157,7 +158,6 @@ Widget rankList(VoteModel<String> model, Iterable<String> items) =>
             onDoubleTap: () => model.removeCandidate(item),
           )
       ],
-      onReorder: model.reorderVotes,
     );
 
 Widget remainingOptions(VoteModel<String> model, Iterable<String> items) =>

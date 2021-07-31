@@ -41,6 +41,7 @@ linter:
     - empty_catches
     - empty_constructor_bodies
     - empty_statements
+    - exhaustive_cases
     - file_names
     - hash_and_equals
     - implementation_imports
@@ -95,6 +96,7 @@ linter:
     - recursive_getters
     - require_trailing_commas
     - slash_for_doc_comments
+    - sort_child_properties_last
     - sort_pub_dependencies
     - test_types_in_equals
     - throw_in_finally
@@ -111,9 +113,12 @@ linter:
     - unnecessary_overrides
     - unnecessary_parenthesis
     - unnecessary_statements
+    - unnecessary_string_escapes
     - unnecessary_string_interpolations
     - unnecessary_this
     - unrelated_type_equality_checks
+    - unsafe_html
+    - use_full_hex_values_for_flutter_colors
     - use_function_type_syntax_for_parameters
     - use_is_even_rather_than_modulo
     - use_rethrow_when_possible
