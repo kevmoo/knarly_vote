@@ -1,8 +1,6 @@
 [![Dart CI](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml/badge.svg)](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml)
 
-# Try it out
-
-Hosted at https://knarlyvote.com
+Try it out: https://knarlyvote.com
 
 # tl;dr
 
@@ -19,6 +17,11 @@ A (work-in-progress) demonstration of: (1) a full-stack
 # Event flow
 
 ![Event flow](docs/event_flow.svg)
+
+# YouTube discussion about the project
+
+July 29, 2021
+[![Rubber Duck Engineering #58](https://img.youtube.com/vi/SImcty5QJhM/maxresdefault.jpg)](https://www.youtube.com/watch?v=SImcty5QJhM "Video Title")
 
 # Getting started and local development
 
