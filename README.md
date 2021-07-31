@@ -20,8 +20,9 @@ A (work-in-progress) demonstration of: (1) a full-stack
 
 # YouTube discussion about the project
 
-July 29, 2021
 [![Rubber Duck Engineering #58](https://img.youtube.com/vi/SImcty5QJhM/maxresdefault.jpg)](https://www.youtube.com/watch?v=SImcty5QJhM "Video Title")
+
+From July 29, 2021
 
 # Getting started and local development
 
