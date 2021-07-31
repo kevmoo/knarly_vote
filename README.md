@@ -1,7 +1,5 @@
 [![Dart CI](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml/badge.svg)](https://github.com/kevmoo/knarly_vote/actions/workflows/dart.yml)
 
-![Knarly Vote screen shot](docs/knarly_screen_shot_2021-07-20.png)
-
 # Try it out
 
 Hosted at https://knarlyvote.com
