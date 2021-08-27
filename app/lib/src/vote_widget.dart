@@ -1,10 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
-import 'package:provider/provider.dart';
 import 'package:vote_widgets/vote_widgets.dart';
 
 import 'election_result_model.dart';
+import 'provider_consumer_combo.dart';
 import 'user_voting_model.dart';
 import 'vote_model.dart';
 
@@ -15,76 +15,71 @@ class VoteWidget extends StatelessWidget {
   VoteWidget(this._user, this._data);
 
   @override
-  Widget build(BuildContext context) => ChangeNotifierProvider(
+  Widget build(BuildContext context) => createProviderConsumer<UserVotingModel>(
         create: (_) => UserVotingModel(_user, _data),
-        child: Consumer<UserVotingModel>(
-          builder: (context, model, __) {
-            final electionModel = model.electionResultModel;
-            final voteModel = model.voteModel;
+        builder: (context, model, __) {
+          final electionModel = model.electionResultModel;
+          final voteModel = model.voteModel;
 
-            return Column(
-              children: [
-                Text(
-                  'State: ${model.state.name}',
-                  style: const TextStyle(fontStyle: FontStyle.italic),
-                ),
-                if (model.state == UserVotingModelState.error)
-                  const Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Check out the dev console. Reload?',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
+          return Column(
+            children: [
+              Text(
+                'State: ${model.state.name}',
+                style: const TextStyle(fontStyle: FontStyle.italic),
+              ),
+              if (model.state == UserVotingModelState.error)
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
                   child: Text(
-                    model.electionName,
-                    textScaleFactor: 2,
-                  ),
-                ),
-                ChangeNotifierProvider.value(
-                  value: electionModel,
-                  child: Consumer<ElectionResultModel>(
-                    builder: (_, model, __) {
-                      final result = model.value;
-                      if (result == null) {
-                        return const Text(
-                          'Waiting for result to be calculated...',
-                        );
-                      }
-                      final ballotCount = electionModel.ballotCount;
-                      return Column(
-                        children: [
-                          if (ballotCount != null)
-                            Text(
-                              'All cast ballots: $ballotCount',
-                              textScaleFactor: 1.5,
-                            ),
-                          CondorcetElectionResultWidget(result),
-                        ],
-                      );
-                    },
-                  ),
-                ),
-                if (voteModel != null)
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: ChangeNotifierProvider.value(
-                        value: voteModel,
-                        child:
-                            Consumer<VoteModel<String>>(builder: _buildLists),
-                      ),
+                    'Check out the dev console. Reload?',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: Colors.red,
                     ),
                   ),
-              ],
-            );
-          },
-        ),
+                ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  model.electionName,
+                  textScaleFactor: 2,
+                ),
+              ),
+              valueProviderConsumer<ElectionResultModel>(
+                value: electionModel,
+                builder: (_, model, __) {
+                  final result = model.value;
+                  if (result == null) {
+                    return const Text(
+                      'Waiting for result to be calculated...',
+                    );
+                  }
+                  final ballotCount = electionModel.ballotCount;
+                  return Column(
+                    children: [
+                      if (ballotCount != null)
+                        Text(
+                          'All cast ballots: $ballotCount',
+                          textScaleFactor: 1.5,
+                        ),
+                      CondorcetElectionResultWidget(result),
+                    ],
+                  );
+                },
+              ),
+              if (voteModel != null)
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: valueProviderConsumer<VoteModel<String>>(
+                      value: voteModel,
+                      builder: _buildLists,
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       );
 }
 

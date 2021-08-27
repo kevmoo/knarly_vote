@@ -2,10 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:knarly_common/knarly_common.dart';
-import 'package:provider/provider.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
+import 'src/provider_consumer_combo.dart';
 import 'src/temp.dart';
 import 'src/vote_widget.dart';
 
@@ -38,47 +38,45 @@ class _KnarlyApp extends StatelessWidget {
           body: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 800),
-              child: ChangeNotifierProvider(
+              child: createProviderConsumer<FirebaseAuthModel>(
                 create: (_) => FirebaseAuthModel(),
-                child: Consumer<FirebaseAuthModel>(
-                  builder: (context, authModel, __) {
-                    final user = authModel.value;
+                builder: (context, authModel, __) {
+                  final user = authModel.value;
 
-                    return Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              if (user == null)
-                                ElevatedButton(
-                                  onPressed: _onSignIn,
-                                  child: const Text(
-                                    'Sign in with your Google account',
-                                  ),
+                  return Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (user == null)
+                              ElevatedButton(
+                                onPressed: _onSignIn,
+                                child: const Text(
+                                  'Sign in with your Google account',
                                 ),
-                              if (user != null) ...[
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Text(user.email ?? '?@?.com'),
+                              ),
+                            if (user != null) ...[
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(user.email ?? '?@?.com'),
+                              ),
+                              ElevatedButton(
+                                onPressed: _onSignOut,
+                                child: const Text(
+                                  'Sign out',
                                 ),
-                                ElevatedButton(
-                                  onPressed: _onSignOut,
-                                  child: const Text(
-                                    'Sign out',
-                                  ),
-                                ),
-                              ]
-                            ],
-                          ),
+                              ),
+                            ]
+                          ],
                         ),
-                        Expanded(child: _withUser(user)),
-                      ],
-                    );
-                  },
-                ),
+                      ),
+                      Expanded(child: _withUser(user)),
+                    ],
+                  );
+                },
               ),
             ),
           ),
