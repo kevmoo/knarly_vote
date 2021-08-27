@@ -35,11 +35,11 @@ class _KnarlyApp extends StatelessWidget {
               child: const Text('Source: $_sourceUrl'),
             ),
           ),
-          body: ChangeNotifierProvider(
-            create: (_) => FirebaseAuthModel(),
-            child: Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 800),
+          body: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: ChangeNotifierProvider(
+                create: (_) => FirebaseAuthModel(),
                 child: Consumer<FirebaseAuthModel>(
                   builder: (context, authModel, __) {
                     final user = authModel.value;
