@@ -5,6 +5,7 @@ import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_widget.dart';
+import 'src/election_list_widget.dart';
 import 'src/temp.dart';
 import 'src/vote_widget.dart';
 
@@ -52,7 +53,8 @@ class _KnarlyApp extends StatelessWidget {
           return const Redirect('/elections');
         },
         routes: {
-          '/elections': (_) => _scaffoldSignedIn(user, _listElections(user)),
+          '/elections': (_) =>
+              _scaffoldSignedIn(user, ElectionListWidget(user)),
           '/elections/:id': (_) => _scaffoldSignedIn(user, _getElection(user)),
         },
       );
@@ -137,35 +139,6 @@ Widget _getElection(User user) => FutureBuilder<Election>(
 
         if (snapshot.hasData) {
           return VoteWidget(user, snapshot.requireData);
-        }
-
-        return const Center(child: Text('Downloading election...'));
-      },
-    );
-
-Widget _listElections(User user) => FutureBuilder<List<Election>>(
-      future: listElections(user),
-      builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          // TODO: Probably could do something a bit better here...
-          return Center(
-            child: Text(
-              snapshot.error.toString(),
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        }
-
-        if (snapshot.hasData) {
-          final _elections = snapshot.requireData;
-          return ListView.builder(
-            itemCount: _elections.length,
-            itemBuilder: (ctx, index) => ElevatedButton(
-              onPressed: () =>
-                  Routemaster.of(context).push(_elections[index].id),
-              child: Text(_elections[index].name),
-            ),
-          );
         }
 
         return const Center(child: Text('Downloading election...'));
