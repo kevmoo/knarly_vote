@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:vote_widgets/vote_widgets.dart';
 
-import 'election_result_model.dart';
-import 'provider_consumer_combo.dart';
-import 'user_voting_model.dart';
-import 'vote_model.dart';
+import '../election_result_model.dart';
+import '../provider_consumer_combo.dart';
+import '../user_voting_model.dart';
+import '../vote_model.dart';
 
 class VoteWidget extends StatelessWidget {
   final User _user;

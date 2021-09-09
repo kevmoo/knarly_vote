@@ -2,8 +2,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
 
+import '../shared.dart';
 import 'network_async_widget.dart';
-import 'shared.dart';
 import 'vote_widget.dart';
 
 class ElectionShowWidget extends StatelessWidget {

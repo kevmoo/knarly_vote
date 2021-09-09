@@ -4,8 +4,8 @@ import 'package:flutter/widgets.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:routemaster/routemaster.dart';
 
+import '../shared.dart';
 import 'network_async_widget.dart';
-import 'shared.dart';
 
 class ElectionListWidget extends StatelessWidget {
   final User _user;

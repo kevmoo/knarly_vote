@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
-import 'src/auth_widget.dart';
-import 'src/election_list_widget.dart';
-import 'src/election_show_widget.dart';
+import 'src/widgets/auth_widget.dart';
+import 'src/widgets/election_list_widget.dart';
+import 'src/widgets/election_show_widget.dart';
 
 Future<void> main() async {
   runApp(_KnarlyApp());

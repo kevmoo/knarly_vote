@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
 
-import 'auth_model.dart';
-import 'provider_consumer_combo.dart';
+import '../auth_model.dart';
+import '../provider_consumer_combo.dart';
 
 class AuthWidget extends StatelessWidget {
   final Widget Function(BuildContext context, User? user) _builder;
