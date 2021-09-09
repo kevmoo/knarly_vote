@@ -1,13 +1,9 @@
-import 'dart:convert';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:http/http.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:routemaster/routemaster.dart';
 
-import 'network_exception.dart';
 import 'shared.dart';
 
 class ElectionListWidget extends StatelessWidget {
@@ -49,19 +45,7 @@ class ElectionListWidget extends StatelessWidget {
 }
 
 Future<List<Election>> _listElections(User user) async {
-  final firebaseIdToken = await user.getIdToken();
-
-  final uri = Uri.parse('api/elections/');
-  final response = await get(uri, headers: authHeaders(firebaseIdToken));
-  if (response.statusCode != 200) {
-    throw NetworkException(
-      'Bad response from service! ${response.statusCode}. '
-      '${response.body}',
-      statusCode: response.statusCode,
-      uri: uri,
-    );
-  }
-  final json = jsonDecode(response.body) as List;
+  final json = await getJson(user, 'api/elections/') as List;
   if (json.isEmpty) {
     throw StateError('No values returned!');
   }
