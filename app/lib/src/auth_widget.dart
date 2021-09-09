@@ -20,7 +20,10 @@ class AuthWidget extends StatelessWidget {
               case ConnectionState.done:
                 return _builder(context, authModel.value);
               default:
-                return const Placeholder();
+                return const Text(
+                  'Loading...',
+                  textDirection: TextDirection.ltr,
+                );
             }
           },
         ),
