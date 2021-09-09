@@ -1,16 +1,14 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_web_plugins/flutter_web_plugins.dart';
 import 'package:knarly_common/knarly_common.dart';
+import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
-import 'src/auth_model.dart';
-import 'src/provider_consumer_combo.dart';
+import 'src/auth_widget.dart';
 import 'src/temp.dart';
 import 'src/vote_widget.dart';
 
 Future<void> main() async {
-  setUrlStrategy(PathUrlStrategy());
   runApp(_KnarlyApp());
 }
 
@@ -18,68 +16,69 @@ const _sourceUrl = 'github.com/kevmoo/knarly_vote';
 final _sourceUri = Uri.parse('https://$_sourceUrl');
 
 class _KnarlyApp extends StatelessWidget {
-  static const _title = 'Knarly Vote';
+  _KnarlyApp({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
-        title: _title,
-        home: Scaffold(
-          appBar: AppBar(
-            title: const Text(_title),
+  Widget build(BuildContext context) => AuthWidget(
+        (context, user) => MaterialApp.router(
+          routerDelegate: RoutemasterDelegate(
+            routesBuilder: (context) {
+              if (user == null) {
+                return _loggedOutRouteMap;
+              }
+
+              return _loggedInRouteMap(user);
+            },
           ),
-          bottomNavigationBar: Link(
-            uri: _sourceUri,
-            target: LinkTarget.blank,
-            builder: (context, followLink) => ElevatedButton(
-              onPressed: followLink,
-              child: const Text('Source: $_sourceUrl'),
+          routeInformationParser: const RoutemasterParser(),
+        ),
+      );
+
+  late final _loggedOutRouteMap = RouteMap(
+    onUnknownRoute: (route) => const Redirect('/'),
+    routes: {
+      '/': (_) => _scaffold(
+            ElevatedButton(
+              onPressed: _onSignIn,
+              child: const Text('Sign in with your Google account'),
             ),
           ),
-          body: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: createProviderConsumer<FirebaseAuthModel>(
-                create: (_) => FirebaseAuthModel(),
-                builder: (context, authModel, __) {
-                  final user = authModel.value;
+    },
+  );
 
-                  return Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (user == null)
-                              ElevatedButton(
-                                onPressed: _onSignIn,
-                                child: const Text(
-                                  'Sign in with your Google account',
-                                ),
-                              ),
-                            if (user != null) ...[
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(user.email ?? '?@?.com'),
-                              ),
-                              ElevatedButton(
-                                onPressed: _onSignOut,
-                                child: const Text(
-                                  'Sign out',
-                                ),
-                              ),
-                            ]
-                          ],
-                        ),
-                      ),
-                      Expanded(child: _withUser(user)),
-                    ],
-                  );
-                },
+  RouteMap _loggedInRouteMap(User user) => RouteMap(
+        onUnknownRoute: (route) {
+          print('logged in route unknown! $route');
+          return const Redirect('/elections');
+        },
+        routes: {
+          '/elections': (_) => _scaffoldSignedIn(user, _listElections(user)),
+          '/elections/:id': (_) => _scaffoldSignedIn(user, _getElection(user)),
+        },
+      );
+
+  RouteSettings _scaffoldSignedIn(User user, Widget child) => _scaffold(
+        Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(user.email ?? '?@?.com'),
+                  ),
+                  ElevatedButton(
+                    onPressed: _onSignOut,
+                    child: const Text('Sign out'),
+                  ),
+                ],
               ),
             ),
-          ),
+            Expanded(child: child),
+          ],
         ),
       );
 
@@ -101,25 +100,74 @@ class _KnarlyApp extends StatelessWidget {
   }
 }
 
-Widget _withUser(User? user) => user == null
-    ? const Center(child: Text('Must sign in...'))
-    : FutureBuilder<Election>(
-        future: downloadFirstElection(user),
-        builder: (buildContext, snapshot) {
-          if (snapshot.hasError) {
-            // TODO: Probably could do something a bit better here...
-            return Center(
-              child: Text(
-                snapshot.error.toString(),
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
+RouteSettings _scaffold(Widget child) => MaterialPage(
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Knarlry vote')),
+        bottomNavigationBar: Link(
+          uri: _sourceUri,
+          target: LinkTarget.blank,
+          builder: (context, followLink) => ElevatedButton(
+            onPressed: followLink,
+            child: const Text('Source: $_sourceUrl'),
+          ),
+        ),
+        body: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 800),
+            child: Container(
+              child: child,
+            ),
+          ),
+        ),
+      ),
+    );
 
-          if (snapshot.hasData) {
-            return VoteWidget(user, snapshot.requireData);
-          }
+Widget _getElection(User user) => FutureBuilder<Election>(
+      future: downloadFirstElection(user),
+      builder: (buildContext, snapshot) {
+        if (snapshot.hasError) {
+          // TODO: Probably could do something a bit better here...
+          return Center(
+            child: Text(
+              snapshot.error.toString(),
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
 
-          return const Center(child: Text('Downloading election...'));
-        },
-      );
+        if (snapshot.hasData) {
+          return VoteWidget(user, snapshot.requireData);
+        }
+
+        return const Center(child: Text('Downloading election...'));
+      },
+    );
+
+Widget _listElections(User user) => FutureBuilder<List<Election>>(
+      future: listElections(user),
+      builder: (context, snapshot) {
+        if (snapshot.hasError) {
+          // TODO: Probably could do something a bit better here...
+          return Center(
+            child: Text(
+              snapshot.error.toString(),
+              style: const TextStyle(color: Colors.red),
+            ),
+          );
+        }
+
+        if (snapshot.hasData) {
+          final _elections = snapshot.requireData;
+          return ListView.builder(
+            itemCount: _elections.length,
+            itemBuilder: (ctx, index) => ElevatedButton(
+              onPressed: () =>
+                  Routemaster.of(context).push(_elections[index].id),
+              child: Text(_elections[index].name),
+            ),
+          );
+        }
+
+        return const Center(child: Text('Downloading election...'));
+      },
+    );

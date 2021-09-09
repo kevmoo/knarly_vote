@@ -27,3 +27,24 @@ Future<Election> downloadFirstElection(User user) async {
 
   return Election.fromJson(json.first as Map<String, dynamic>);
 }
+
+Future<List<Election>> listElections(User user) async {
+  final firebaseIdToken = await user.getIdToken();
+
+  final uri = Uri.parse('api/elections/');
+  final response = await get(uri, headers: authHeaders(firebaseIdToken));
+  if (response.statusCode != 200) {
+    throw NetworkException(
+      'Bad response from service! ${response.statusCode}. '
+      '${response.body}',
+      statusCode: response.statusCode,
+      uri: uri,
+    );
+  }
+  final json = jsonDecode(response.body) as List;
+  if (json.isEmpty) {
+    throw StateError('No values returned!');
+  }
+
+  return json.map((e) => Election.fromJson(e as Map<String, dynamic>)).toList();
+}

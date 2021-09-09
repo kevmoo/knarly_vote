@@ -17,6 +17,7 @@ dependencies:
   knarly_common:
     path: ../common
   provider: ^6.0.0
+  routemaster: ^0.10.0-dev2
 
   url_launcher: ^6.0.9
   vote: any

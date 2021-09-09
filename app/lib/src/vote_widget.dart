@@ -54,7 +54,7 @@ class VoteWidget extends StatelessWidget {
                       'Waiting for result to be calculated...',
                     );
                   }
-                  final ballotCount = electionModel.ballotCount;
+                  final ballotCount = model.ballotCount;
                   return Column(
                     children: [
                       if (ballotCount != null)

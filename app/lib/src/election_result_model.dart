@@ -52,6 +52,9 @@ class ElectionResultModel extends ChangeNotifier
     _subscription?.cancel();
     super.dispose();
   }
+
+  @override
+  String toString() => 'ElectionResultModel $electionId ($hashCode)';
 }
 
 CondorcetElectionResult<String> _decode(Map<String, dynamic> map) {

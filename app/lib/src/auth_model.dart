@@ -5,7 +5,11 @@ import 'package:flutter/foundation.dart';
 
 class FirebaseAuthModel extends ChangeNotifier
     implements ValueListenable<User?> {
+  final _initializeCompleter = Completer<void>.sync();
+
   StreamSubscription<User?>? _subscription;
+
+  Future<void> get initializationComplete => _initializeCompleter.future;
 
   @override
   User? get value => FirebaseAuth.instance.currentUser;
@@ -16,6 +20,9 @@ class FirebaseAuthModel extends ChangeNotifier
     if (_subscription == null && hasListeners) {
       _subscription = FirebaseAuth.instance.userChanges().listen((_) {
         assert(_subscription != null);
+        if (!_initializeCompleter.isCompleted) {
+          _initializeCompleter.complete();
+        }
         notifyListeners();
       });
     }
