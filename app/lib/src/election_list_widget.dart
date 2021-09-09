@@ -32,10 +32,13 @@ class ElectionListWidget extends StatelessWidget {
             final _elections = snapshot.requireData;
             return ListView.builder(
               itemCount: _elections.length,
-              itemBuilder: (ctx, index) => ElevatedButton(
-                onPressed: () =>
-                    Routemaster.of(context).push(_elections[index].id),
-                child: Text(_elections[index].name),
+              itemBuilder: (ctx, index) => Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () =>
+                      Routemaster.of(context).push(_elections[index].id),
+                  child: Text(_elections[index].name),
+                ),
               ),
             );
           }
