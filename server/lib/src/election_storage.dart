@@ -5,6 +5,8 @@ import 'package:knarly_common/knarly_common.dart';
 abstract class ElectionStorage {
   FutureOr<List<Election>> listElection(String userId);
 
+  FutureOr<Election> getElection(String userId, String electionId);
+
   FutureOr<Ballot> getBallot(String userId, String electionId);
 
   FutureOr<Ballot> updateBallot(

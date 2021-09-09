@@ -43,6 +43,13 @@ firebase.initializeApp(${jsonEncode(config.firebaseConfig())});
     return _okJsonResponse(await _storage.listElection(userId));
   }
 
+  @Route.get('/api/elections/<electionId>/')
+  Future<Response> getElection(Request request, String electionId) async {
+    final userId = await _jwtSubjectFromRequest(request);
+
+    return _okJsonResponse(await _storage.getElection(userId, electionId));
+  }
+
   @Route.get('/api/ballots/<electionId>/')
   Future<Response> ballot(Request request, String electionId) async {
     final userId = await _jwtSubjectFromRequest(request);

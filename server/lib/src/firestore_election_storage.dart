@@ -9,6 +9,7 @@ import 'package:knarly_common/knarly_common.dart';
 import 'election_storage.dart';
 import 'header_access_middleware.dart';
 import 'service_config.dart';
+import 'service_exception.dart';
 import 'trace_context.dart';
 import 'vote_logic.dart';
 
@@ -45,6 +46,23 @@ class FirestoreElectionStorage implements ElectionStorage {
     );
 
     return result.documents!.map((d) => d.toElection()).toList();
+  }
+
+  @override
+  FutureOr<Election> getElection(String userId, String electionId) async {
+    try {
+      final result = await _documents.get(_electionDocumentPath(electionId));
+
+      return result.toElection();
+    } on DetailedApiRequestError catch (e) {
+      if (e.status == 404) {
+        throw ServiceException(
+          ServiceExceptionKind.resourceNotFound,
+          'Election does not exist or user does not have access to it.',
+        );
+      }
+      rethrow;
+    }
   }
 
   @override

@@ -53,6 +53,12 @@ class InMemoryElectionStorage implements ElectionStorage {
     // TODO: implement updateElection
     throw UnimplementedError();
   }
+
+  @override
+  FutureOr<Election> getElection(String userId, String electionId) {
+    // TODO: implement getElection
+    throw UnimplementedError();
+  }
 }
 
 String _mapKey(String userId, String electionId) =>

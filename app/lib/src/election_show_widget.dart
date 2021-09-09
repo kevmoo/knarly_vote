@@ -41,7 +41,7 @@ class ElectionShowWidget extends StatelessWidget {
 Future<Election> _downloadFirstElection(User user, String electionId) async {
   final firebaseIdToken = await user.getIdToken();
 
-  final uri = Uri.parse('api/elections/');
+  final uri = Uri.parse('api/elections/$electionId/');
   final response = await get(uri, headers: authHeaders(firebaseIdToken));
   if (response.statusCode != 200) {
     throw NetworkException(
@@ -51,10 +51,7 @@ Future<Election> _downloadFirstElection(User user, String electionId) async {
       uri: uri,
     );
   }
-  final json = jsonDecode(response.body) as List;
-  if (json.isEmpty) {
-    throw StateError('No values returned!');
-  }
+  final json = jsonDecode(response.body) as Map<String, dynamic>;
 
-  return Election.fromJson(json.first as Map<String, dynamic>);
+  return Election.fromJson(json);
 }
