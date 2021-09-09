@@ -1,13 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:knarly_common/knarly_common.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_widget.dart';
 import 'src/election_list_widget.dart';
-import 'src/temp.dart';
-import 'src/vote_widget.dart';
+import 'src/election_show_widget.dart';
 
 Future<void> main() async {
   runApp(_KnarlyApp());
@@ -55,7 +53,10 @@ class _KnarlyApp extends StatelessWidget {
         routes: {
           '/elections': (_) =>
               _scaffoldSignedIn(user, ElectionListWidget(user)),
-          '/elections/:id': (_) => _scaffoldSignedIn(user, _getElection(user)),
+          '/elections/:id': (route) => _scaffoldSignedIn(
+                user,
+                ElectionShowWidget(user, route.pathParameters['id']!),
+              ),
         },
       );
 
@@ -122,25 +123,4 @@ RouteSettings _scaffold(Widget child) => MaterialPage(
           ),
         ),
       ),
-    );
-
-Widget _getElection(User user) => FutureBuilder<Election>(
-      future: downloadFirstElection(user),
-      builder: (buildContext, snapshot) {
-        if (snapshot.hasError) {
-          // TODO: Probably could do something a bit better here...
-          return Center(
-            child: Text(
-              snapshot.error.toString(),
-              style: const TextStyle(color: Colors.red),
-            ),
-          );
-        }
-
-        if (snapshot.hasData) {
-          return VoteWidget(user, snapshot.requireData);
-        }
-
-        return const Center(child: Text('Downloading election...'));
-      },
     );
