@@ -40,7 +40,7 @@ class ElectionListWidget extends StatelessWidget {
             );
           }
 
-          return const Center(child: Text('Downloading election...'));
+          return const Center(child: Text('Downloading elections...'));
         },
       );
 }
