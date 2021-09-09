@@ -6,6 +6,7 @@ import 'package:url_launcher/link.dart';
 import 'src/widgets/auth_widget.dart';
 import 'src/widgets/election_list_widget.dart';
 import 'src/widgets/election_show_widget.dart';
+import 'src/widgets/signed_in_user_widget.dart';
 
 Future<void> main() async {
   runApp(_KnarlyApp());
@@ -61,27 +62,9 @@ class _KnarlyApp extends StatelessWidget {
       );
 
   RouteSettings _scaffoldSignedIn(User user, Widget child) => _scaffold(
-        Column(
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(user.email ?? '?@?.com'),
-                  ),
-                  ElevatedButton(
-                    onPressed: _onSignOut,
-                    child: const Text('Sign out'),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(child: child),
-          ],
+        SignedInUserWidget(
+          user: user,
+          child: child,
         ),
       );
 
@@ -89,14 +72,6 @@ class _KnarlyApp extends StatelessWidget {
     try {
       final googleProvider = GoogleAuthProvider()..addScope('email');
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> _onSignOut() async {
-    try {
-      await FirebaseAuth.instance.signOut();
     } catch (error) {
       print(error);
     }
