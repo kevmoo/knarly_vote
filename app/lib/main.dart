@@ -78,8 +78,15 @@ class _KnarlyApp extends StatelessWidget {
   }
 }
 
-RouteSettings _scaffold(Widget child) => MaterialPage(
-      child: Scaffold(
+RouteSettings _scaffold(Widget child) =>
+    MaterialPage(child: _ScaffoldWidget(child: child));
+
+class _ScaffoldWidget extends StatelessWidget {
+  final Widget child;
+  const _ScaffoldWidget({Key? key, required this.child}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
         appBar: AppBar(title: const Text('Knarlry vote')),
         bottomNavigationBar: Link(
           uri: _sourceUri,
@@ -97,5 +104,5 @@ RouteSettings _scaffold(Widget child) => MaterialPage(
             ),
           ),
         ),
-      ),
-    );
+      );
+}
