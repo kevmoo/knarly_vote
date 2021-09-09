@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:routemaster/routemaster.dart';
 
+import 'network_async_widget.dart';
 import 'shared.dart';
 
 class ElectionListWidget extends StatelessWidget {
@@ -11,36 +12,19 @@ class ElectionListWidget extends StatelessWidget {
   const ElectionListWidget(this._user, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => FutureBuilder<List<Election>>(
+  Widget build(BuildContext context) => NetworkAsyncWidget<List<Election>>(
         future: _listElections(_user),
-        builder: (context, snapshot) {
-          if (snapshot.hasError) {
-            // TODO: Probably could do something a bit better here...
-            return Center(
-              child: Text(
-                snapshot.error.toString(),
-                style: const TextStyle(color: Colors.red),
-              ),
-            );
-          }
-
-          if (snapshot.hasData) {
-            final _elections = snapshot.requireData;
-            return ListView.builder(
-              itemCount: _elections.length,
-              itemBuilder: (ctx, index) => Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: ElevatedButton(
-                  onPressed: () =>
-                      Routemaster.of(context).push(_elections[index].id),
-                  child: Text(_elections[index].name),
-                ),
-              ),
-            );
-          }
-
-          return const Center(child: Text('Downloading elections...'));
-        },
+        waitingText: 'Downloading elections...',
+        builder: (ctx, data) => ListView.builder(
+          itemCount: data.length,
+          itemBuilder: (ctx, index) => Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: ElevatedButton(
+              onPressed: () => Routemaster.of(context).push(data[index].id),
+              child: Text(data[index].name),
+            ),
+          ),
+        ),
       );
 }
 
