@@ -13,7 +13,7 @@ class ElectionListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => NetworkAsyncWidget<List<Election>>(
-        future: _listElections(_user),
+        valueFactory: () => _listElections(_user),
         waitingText: 'Downloading elections...',
         builder: (ctx, data) => ListView.builder(
           itemCount: data.length,

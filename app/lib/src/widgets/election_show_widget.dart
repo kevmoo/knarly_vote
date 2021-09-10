@@ -14,7 +14,7 @@ class ElectionShowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => NetworkAsyncWidget<Election>(
-        future: _downloadFirstElection(_user, _electionId),
+        valueFactory: () => _downloadFirstElection(_user, _electionId),
         waitingText: 'Downloading election...',
         builder: (ctx, data) => VoteWidget(_user, data),
       );
