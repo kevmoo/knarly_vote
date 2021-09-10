@@ -14,15 +14,15 @@ class ElectionShowWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => NetworkAsyncWidget<Election>(
-        valueFactory: () => _downloadFirstElection(_user, _electionId),
+        valueFactory: _downloadFirstElection,
         waitingText: 'Downloading election...',
         builder: (ctx, data) => VoteWidget(_user, data),
       );
-}
 
-Future<Election> _downloadFirstElection(User user, String electionId) async {
-  final json =
-      await getJson(user, 'api/elections/$electionId/') as Map<String, dynamic>;
+  Future<Election> _downloadFirstElection() async {
+    final json = await getJson(_user, 'api/elections/$_electionId/')
+        as Map<String, dynamic>;
 
-  return Election.fromJson(json);
+    return Election.fromJson(json);
+  }
 }

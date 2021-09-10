@@ -13,7 +13,7 @@ class ElectionListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => NetworkAsyncWidget<List<Election>>(
-        valueFactory: () => _listElections(_user),
+        valueFactory: _listElections,
         waitingText: 'Downloading elections...',
         builder: (ctx, data) => ListView.builder(
           itemCount: data.length,
@@ -26,13 +26,15 @@ class ElectionListWidget extends StatelessWidget {
           ),
         ),
       );
-}
 
-Future<List<Election>> _listElections(User user) async {
-  final json = await getJson(user, 'api/elections/') as List;
-  if (json.isEmpty) {
-    throw StateError('No values returned!');
+  Future<List<Election>> _listElections() async {
+    final json = await getJson(_user, 'api/elections/') as List;
+    if (json.isEmpty) {
+      throw StateError('No values returned!');
+    }
+
+    return json
+        .map((e) => Election.fromJson(e as Map<String, dynamic>))
+        .toList();
   }
-
-  return json.map((e) => Election.fromJson(e as Map<String, dynamic>)).toList();
 }
