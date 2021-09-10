@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
+import 'src/shared.dart';
 import 'src/widgets/auth_widget.dart';
 import 'src/widgets/election_list_widget.dart';
 import 'src/widgets/election_show_widget.dart';
@@ -21,6 +22,7 @@ class _KnarlyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AuthWidget(
         (context, user) => MaterialApp.router(
+          title: siteTitle,
           routerDelegate: RoutemasterDelegate(
             routesBuilder: (context) {
               if (user == null) {
@@ -87,7 +89,7 @@ class _ScaffoldWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: const Text('Knarlry vote')),
+        appBar: AppBar(title: const Text(siteTitle)),
         bottomNavigationBar: Link(
           uri: _sourceUri,
           target: LinkTarget.blank,

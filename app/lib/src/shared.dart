@@ -5,6 +5,8 @@ import 'package:http/http.dart';
 
 import 'network_exception.dart';
 
+const siteTitle = 'Knarly Vote';
+
 Map<String, String> authHeaders(String bearerToken) =>
     {'Authorization': 'Bearer $bearerToken'};
 
