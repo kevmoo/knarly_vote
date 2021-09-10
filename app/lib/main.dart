@@ -57,7 +57,7 @@ class _KnarlyApp extends StatelessWidget {
         },
       );
 
-  RouteSettings _scaffoldSignedIn(User user, Widget child) => _scaffold(
+  MaterialPage _scaffoldSignedIn(User user, Widget child) => _scaffold(
         SignedInUserWidget(
           user: user,
           child: child,
@@ -65,8 +65,10 @@ class _KnarlyApp extends StatelessWidget {
       );
 }
 
-RouteSettings _scaffold(Widget child) =>
-    MaterialPage(child: _ScaffoldWidget(child: child));
+MaterialPage _scaffold(Widget child) => MaterialPage(
+      maintainState: false,
+      child: _ScaffoldWidget(child: child),
+    );
 
 class _ScaffoldWidget extends StatelessWidget {
   final Widget child;
