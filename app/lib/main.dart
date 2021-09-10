@@ -39,7 +39,12 @@ class _KnarlyApp extends StatelessWidget {
 
   late final _loggedOutRouteMap = RouteMap(
     onUnknownRoute: (route) => const Redirect('/'),
-    routes: {'/': (_) => _scaffold(const RootWidget())},
+    routes: {
+      '/': (_) => _scaffold(
+            key: _rootKey,
+            child: const RootWidget(),
+          )
+    },
   );
 
   RouteMap _loggedInRouteMap(User user) => RouteMap(
@@ -48,24 +53,43 @@ class _KnarlyApp extends StatelessWidget {
           return const Redirect('/elections');
         },
         routes: {
-          '/elections': (_) =>
-              _scaffoldSignedIn(user, ElectionListWidget(user)),
+          '/elections': (_) => _scaffoldSignedIn(
+                key: _electionListKey,
+                user: user,
+                child: ElectionListWidget(user),
+              ),
           '/elections/:id': (route) => _scaffoldSignedIn(
-                user,
-                ElectionShowWidget(user, route.pathParameters['id']!),
+                key: _electionShowKey,
+                user: user,
+                child: ElectionShowWidget(user, route.pathParameters['id']!),
               ),
         },
       );
 
-  MaterialPage _scaffoldSignedIn(User user, Widget child) => _scaffold(
-        SignedInUserWidget(
+  MaterialPage _scaffoldSignedIn({
+    required User user,
+    required Widget child,
+    required LocalKey key,
+  }) =>
+      _scaffold(
+        child: SignedInUserWidget(
           user: user,
           child: child,
         ),
+        key: key,
       );
+
+  static final _rootKey = UniqueKey();
+  static final _electionListKey = UniqueKey();
+  static final _electionShowKey = UniqueKey();
 }
 
-MaterialPage _scaffold(Widget child) => MaterialPage(
+MaterialPage _scaffold({
+  required LocalKey key,
+  required Widget child,
+}) =>
+    MaterialPage(
+      key: key,
       maintainState: false,
       child: _ScaffoldWidget(child: child),
     );
