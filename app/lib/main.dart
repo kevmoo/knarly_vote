@@ -1,4 +1,4 @@
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/material.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
@@ -7,6 +7,7 @@ import 'src/shared.dart';
 import 'src/widgets/auth_widget.dart';
 import 'src/widgets/election_list_widget.dart';
 import 'src/widgets/election_show_widget.dart';
+import 'src/widgets/root_widget.dart';
 import 'src/widgets/signed_in_user_widget.dart';
 
 Future<void> main() async {
@@ -38,14 +39,7 @@ class _KnarlyApp extends StatelessWidget {
 
   late final _loggedOutRouteMap = RouteMap(
     onUnknownRoute: (route) => const Redirect('/'),
-    routes: {
-      '/': (_) => _scaffold(
-            ElevatedButton(
-              onPressed: _onSignIn,
-              child: const Text('Sign in with your Google account'),
-            ),
-          ),
-    },
+    routes: {'/': (_) => _scaffold(const RootWidget())},
   );
 
   RouteMap _loggedInRouteMap(User user) => RouteMap(
@@ -69,15 +63,6 @@ class _KnarlyApp extends StatelessWidget {
           child: child,
         ),
       );
-
-  Future<void> _onSignIn() async {
-    try {
-      final googleProvider = GoogleAuthProvider()..addScope('email');
-      await FirebaseAuth.instance.signInWithPopup(googleProvider);
-    } catch (error) {
-      print(error);
-    }
-  }
 }
 
 RouteSettings _scaffold(Widget child) =>
