@@ -54,12 +54,12 @@ class _KnarlyApp extends StatelessWidget {
         },
         routes: {
           '/elections': (_) => _scaffoldSignedIn(
-                key: _electionListKey,
+                key: ObjectKey('${user.uid}-election-list'),
                 user: user,
                 child: ElectionListWidget(user),
               ),
           '/elections/:id': (route) => _scaffoldSignedIn(
-                key: _electionShowKey,
+                key: ObjectKey('${user.uid}-election-show'),
                 user: user,
                 child: ElectionShowWidget(user, route.pathParameters['id']!),
               ),
@@ -80,8 +80,6 @@ class _KnarlyApp extends StatelessWidget {
       );
 
   static final _rootKey = UniqueKey();
-  static final _electionListKey = UniqueKey();
-  static final _electionShowKey = UniqueKey();
 }
 
 MaterialPage _scaffold({
@@ -112,9 +110,7 @@ class _ScaffoldWidget extends StatelessWidget {
         body: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 800),
-            child: Container(
-              child: child,
-            ),
+            child: child,
           ),
         ),
       );
