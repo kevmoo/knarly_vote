@@ -22,6 +22,7 @@ class VoteWidget extends StatelessWidget {
           final voteModel = model.voteModel;
 
           return Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'State: ${model.state.name}',
@@ -56,6 +57,7 @@ class VoteWidget extends StatelessWidget {
                   }
                   final ballotCount = model.ballotCount;
                   return Column(
+                    mainAxisSize: MainAxisSize.min,
                     children: [
                       if (ballotCount != null)
                         Text(
@@ -68,13 +70,11 @@ class VoteWidget extends StatelessWidget {
                 },
               ),
               if (voteModel != null)
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: valueProviderConsumer<VoteModel<String>>(
-                      value: voteModel,
-                      builder: _buildLists,
-                    ),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: valueProviderConsumer<VoteModel<String>>(
+                    value: voteModel,
+                    builder: _buildLists,
                   ),
                 ),
             ],
@@ -84,31 +84,30 @@ class VoteWidget extends StatelessWidget {
 }
 
 Widget _buildLists(BuildContext _, VoteModel<String> model, __) => Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Expanded(
+        Flexible(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _sortedListHeader('My Rank'),
-              Expanded(
-                child: _createOrEmpty<String>(
-                  model.rank,
-                  'Press + on an item to add it.',
-                  (items) => rankList(model, items),
-                ),
+              _createOrEmpty<String>(
+                model.rank,
+                'Press + on an item to add it.',
+                (items) => _rankList(model, items),
               ),
             ],
           ),
         ),
-        Expanded(
+        Flexible(
           child: Column(
+            mainAxisSize: MainAxisSize.min,
             children: [
               _sortedListHeader('Remaining options'),
-              Expanded(
-                child: _createOrEmpty<String>(
-                  model.remainingCandidates.toList(),
-                  'You have ranked all items.',
-                  (items) => remainingOptions(model, items),
-                ),
+              _createOrEmpty<String>(
+                model.remainingCandidates.toList(),
+                'You have ranked all items.',
+                (items) => _remainingOptions(model, items),
               ),
             ],
           ),
@@ -122,8 +121,9 @@ Widget _sortedListHeader(String title) => Text(
       style: const TextStyle(fontWeight: FontWeight.bold),
     );
 
-Widget rankList(VoteModel<String> model, Iterable<String> items) =>
+Widget _rankList(VoteModel<String> model, Iterable<String> items) =>
     ReorderableListView(
+      shrinkWrap: true,
       padding: _listViewPadding,
       onReorder: model.reorderVotes,
       children: [
@@ -155,10 +155,9 @@ Widget rankList(VoteModel<String> model, Iterable<String> items) =>
       ],
     );
 
-Widget remainingOptions(VoteModel<String> model, Iterable<String> items) =>
-    ListView(
-      controller: ScrollController(),
-      padding: _listViewPadding,
+Widget _remainingOptions(VoteModel<String> model, Iterable<String> items) =>
+    Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
         for (var item in items)
           GestureDetector(

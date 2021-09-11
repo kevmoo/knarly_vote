@@ -9,6 +9,7 @@ class SignedInUserWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
           Padding(
             padding: const EdgeInsets.all(8.0),
@@ -27,7 +28,7 @@ class SignedInUserWidget extends StatelessWidget {
               ],
             ),
           ),
-          Expanded(child: child),
+          child,
         ],
       );
 

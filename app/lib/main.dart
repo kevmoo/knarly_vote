@@ -107,10 +107,12 @@ class _ScaffoldWidget extends StatelessWidget {
             child: const Text('Source: $_sourceUrl'),
           ),
         ),
-        body: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: child,
+        body: SingleChildScrollView(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 800),
+              child: child,
+            ),
           ),
         ),
       );

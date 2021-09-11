@@ -15,15 +15,18 @@ class ElectionListWidget extends StatelessWidget {
   Widget build(BuildContext context) => NetworkAsyncWidget<List<Election>>(
         valueFactory: _listElections,
         waitingText: 'Downloading elections...',
-        builder: (ctx, data) => ListView.builder(
-          itemCount: data.length,
-          itemBuilder: (ctx, index) => Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: ElevatedButton(
-              onPressed: () => Routemaster.of(context).push(data[index].id),
-              child: Text(data[index].name),
-            ),
-          ),
+        builder: (ctx, List<Election> data) => Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var index = 0; index < data.length; index++)
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                  onPressed: () => Routemaster.of(context).push(data[index].id),
+                  child: Text(data[index].name),
+                ),
+              ),
+          ],
         ),
       );
 
