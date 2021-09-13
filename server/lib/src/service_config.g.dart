@@ -15,6 +15,7 @@ ServiceConfig _$ServiceConfigFromJson(Map json) => $checkedCreate(
         $checkKeys(
           json,
           allowedKeys: const [
+            'appId',
             'apiKey',
             'projectId',
             'electionUpdateTaskLocation',
@@ -30,6 +31,7 @@ ServiceConfig _$ServiceConfigFromJson(Map json) => $checkedCreate(
               $checkedConvert('electionUpdateTaskLocation', (v) => v as String),
           electionUpdateTaskQueueId:
               $checkedConvert('electionUpdateTaskQueueId', (v) => v as String),
+          appId: $checkedConvert('appId', (v) => v as String),
           serviceAccountEmail:
               $checkedConvert('serviceAccountEmail', (v) => v as String),
           webHost: $checkedConvert('webHost', (v) => v as String),
@@ -40,6 +42,7 @@ ServiceConfig _$ServiceConfigFromJson(Map json) => $checkedCreate(
 
 Map<String, dynamic> _$ServiceConfigToJson(ServiceConfig instance) =>
     <String, dynamic>{
+      'appId': instance.appId,
       'apiKey': instance.apiKey,
       'projectId': instance.projectId,
       'electionUpdateTaskLocation': instance.electionUpdateTaskLocation,

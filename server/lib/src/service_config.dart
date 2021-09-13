@@ -7,6 +7,8 @@ part 'service_config.g.dart';
 
 @JsonSerializable(anyMap: true, checked: true, disallowUnrecognizedKeys: true)
 class ServiceConfig {
+  final String appId;
+
   /// https://firebase.google.com/docs/projects/api-keys
   final String apiKey;
 
@@ -33,6 +35,7 @@ class ServiceConfig {
     required this.apiKey,
     required this.electionUpdateTaskLocation,
     required this.electionUpdateTaskQueueId,
+    required this.appId,
     required this.serviceAccountEmail,
     required this.webHost,
   });
@@ -48,8 +51,7 @@ class ServiceConfig {
         //'databaseURL': 'https://$projectId.firebaseio.com',
         //'storageBucket': '$projectId.appspot.com',
         //'messagingSenderId': '????',
-        //'appId': '????',
-        //'measurementId': '???',
+        'appId': appId,
       };
 
   Map<String, dynamic> toJson() => _$ServiceConfigToJson(this);
