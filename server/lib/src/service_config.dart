@@ -95,5 +95,6 @@ const _configKeys = {
   'electionUpdateTaskLocation',
   'electionUpdateTaskQueueId',
   'serviceAccountEmail',
-  'webHost'
+  'webHost',
+  'appId',
 };
