@@ -29,6 +29,7 @@ class VoteService {
   Response getConfig(Request request) => Response.ok(
         '''
 firebase.initializeApp(${jsonEncode(config.firebaseConfig())});
+firebase.analytics();
 ''',
         headers: {
           'content-type': 'application/javascript',
