@@ -1,31 +1,23 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:provider/provider.dart';
 
 import '../auth_model.dart';
-import '../provider_consumer_combo.dart';
+import 'network_async_widget.dart';
 
 class AuthWidget extends StatelessWidget {
-  final Widget Function(BuildContext context, User? user) _builder;
+  final _auth = FirebaseAuthModel();
+  final Widget child;
 
-  AuthWidget(this._builder);
+  AuthWidget({required this.child});
 
   @override
-  Widget build(BuildContext context) =>
-      createProviderConsumer<FirebaseAuthModel>(
-        create: (_) => FirebaseAuthModel(),
-        builder: (context, authModel, __) => FutureBuilder(
-          future: authModel.initializationComplete,
-          builder: (context, snapshot) {
-            switch (snapshot.connectionState) {
-              case ConnectionState.done:
-                return _builder(context, authModel.value);
-              default:
-                return const Text(
-                  'Loading...',
-                  textDirection: TextDirection.ltr,
-                );
-            }
-          },
+  Widget build(BuildContext context) => Directionality(
+        textDirection: TextDirection.ltr,
+        child: NetworkAsyncWidget<void>(
+          valueFactory: () => _auth.initializationComplete,
+          waitingText: 'Loading...',
+          builder: (context, data) =>
+              ChangeNotifierProvider.value(value: _auth, child: child),
         ),
       );
 }

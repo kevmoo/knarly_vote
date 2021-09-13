@@ -1,21 +1,22 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
+import 'package:provider/provider.dart';
 import 'package:vote_widgets/vote_widgets.dart';
 
+import '../auth_model.dart';
 import '../election_result_model.dart';
-import '../provider_consumer_combo.dart';
 import '../user_voting_model.dart';
 import '../vote_model.dart';
 
 class VoteWidget extends StatelessWidget {
-  final User _user;
+  final FirebaseAuthModel _user;
   final Election _data;
 
   VoteWidget(this._user, this._data);
 
   @override
-  Widget build(BuildContext context) => createProviderConsumer<UserVotingModel>(
+  Widget build(BuildContext context) =>
+      _createProviderConsumer<UserVotingModel>(
         create: (_) => UserVotingModel(_user, _data),
         builder: (context, model, __) {
           final electionModel = model.electionResultModel;
@@ -46,7 +47,7 @@ class VoteWidget extends StatelessWidget {
                   textScaleFactor: 2,
                 ),
               ),
-              valueProviderConsumer<ElectionResultModel>(
+              _valueProviderConsumer<ElectionResultModel>(
                 value: electionModel,
                 builder: (_, model, __) {
                   final result = model.value;
@@ -72,7 +73,7 @@ class VoteWidget extends StatelessWidget {
               if (voteModel != null)
                 Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: valueProviderConsumer<VoteModel<String>>(
+                  child: _valueProviderConsumer<VoteModel<String>>(
                     value: voteModel,
                     builder: _buildLists,
                   ),
@@ -192,3 +193,31 @@ Widget _createOrEmpty<T>(
 }
 
 const _listViewPadding = EdgeInsets.all(8);
+
+Widget _createProviderConsumer<T extends ChangeNotifier>({
+  required Create<T> create,
+  required Widget Function(
+    BuildContext context,
+    T value,
+    Widget? child,
+  )
+      builder,
+}) =>
+    ChangeNotifierProvider<T>(
+      create: create,
+      child: Consumer<T>(builder: builder),
+    );
+
+Widget _valueProviderConsumer<T extends ChangeNotifier>({
+  required T value,
+  required Widget Function(
+    BuildContext context,
+    T value,
+    Widget? child,
+  )
+      builder,
+}) =>
+    ChangeNotifierProvider<T>.value(
+      value: value,
+      child: Consumer<T>(builder: builder),
+    );

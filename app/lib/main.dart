@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
+import 'src/auth_model.dart';
 import 'src/shared.dart';
 import 'src/widgets/auth_widget.dart';
 import 'src/widgets/election_list_widget.dart';
@@ -22,18 +24,21 @@ class _KnarlyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => AuthWidget(
-        (context, user) => MaterialApp.router(
-          title: siteTitle,
-          routerDelegate: RoutemasterDelegate(
-            routesBuilder: (context) {
-              if (user == null) {
-                return _loggedOutRouteMap;
-              }
+        child: Consumer<FirebaseAuthModel>(
+          builder: (context, authModel, _) => MaterialApp.router(
+            title: siteTitle,
+            routerDelegate: RoutemasterDelegate(
+              routesBuilder: (context) {
+                final user = authModel.user;
+                if (user == null) {
+                  return _loggedOutRouteMap;
+                }
 
-              return _loggedInRouteMap(user);
-            },
+                return _loggedInRouteMap(user);
+              },
+            ),
+            routeInformationParser: const RoutemasterParser(),
           ),
-          routeInformationParser: const RoutemasterParser(),
         ),
       );
 
@@ -56,12 +61,12 @@ class _KnarlyApp extends StatelessWidget {
           '/elections': (_) => _scaffoldSignedIn(
                 key: ObjectKey('${user.uid}-election-list'),
                 user: user,
-                child: ElectionListWidget(user),
+                child: const ElectionListWidget(),
               ),
           '/elections/:id': (route) => _scaffoldSignedIn(
                 key: ObjectKey('${user.uid}-election-show'),
                 user: user,
-                child: ElectionShowWidget(user, route.pathParameters['id']!),
+                child: ElectionShowWidget(route.pathParameters['id']!),
               ),
         },
       );

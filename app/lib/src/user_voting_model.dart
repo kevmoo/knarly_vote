@@ -1,22 +1,16 @@
 import 'dart:async';
-import 'dart:convert';
 
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:knarly_common/knarly_common.dart';
 
-import 'authenticated_user_mixin.dart';
+import 'auth_model.dart';
 import 'election_result_model.dart';
-import 'network_exception.dart';
 import 'vote_model.dart';
 
-class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
-  final User _user;
+class UserVotingModel extends ChangeNotifier {
+  final FirebaseAuthModel _authenticatedUserMixin;
   final Election _election;
   final ElectionResultModel electionResultModel;
-
-  @override
-  Future<String> requestBearerToken() => _user.getIdToken();
 
   UserVotingModelState _state = UserVotingModelState.justCreated;
 
@@ -24,7 +18,7 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
   bool _switchingStates = false;
 
-  UserVotingModel(this._user, this._election)
+  UserVotingModel(this._authenticatedUserMixin, this._election)
       : electionResultModel = ElectionResultModel(_election.id) {
     _switchState(UserVotingModelState.updatingBallot);
   }
@@ -96,30 +90,19 @@ class UserVotingModel extends ChangeNotifier with AuthenticatedUserMixin {
 
     _stackedUpdateBallotsCount++;
     try {
-      final response = newRank == null
-          ? await get(uri)
-          : await put(
+      final json = newRank == null
+          ? await _authenticatedUserMixin.sendJson('GET', uri)
+          : await _authenticatedUserMixin.sendJson(
+              'PUT',
               uri,
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: jsonEncode(newRank),
+              jsonBody: newRank,
             );
       if (_stackedUpdateBallotsCount > 1) {
         // Only want to update "the world" if this is the last update to go
         // through – otherwise we have timing issues!
         return;
       }
-      if (response.statusCode != 200) {
-        throw NetworkException(
-          'Bad response from service! ${response.statusCode}. '
-          '${response.body}',
-          statusCode: response.statusCode,
-          uri: uri,
-        );
-      }
-      final json = jsonDecode(response.body) as Map<String, dynamic>;
-      final ballot = Ballot.fromJson(json);
+      final ballot = Ballot.fromJson(json as Map<String, dynamic>);
 
       final currentModel = _voteModel;
 

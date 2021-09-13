@@ -14,6 +14,7 @@ extension ObjectExt on Object {
   void doLog(Object? object) => print('$this : $object');
 }
 
+@Deprecated('use other')
 Future<Object?> getJson(User user, String url) async {
   final firebaseIdToken = await user.getIdToken();
 

@@ -1,26 +1,26 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
+import 'package:provider/provider.dart';
 
-import '../shared.dart';
+import '../auth_model.dart';
 import 'network_async_widget.dart';
 import 'vote_widget.dart';
 
 class ElectionShowWidget extends StatelessWidget {
-  final User _user;
   final String _electionId;
-  const ElectionShowWidget(this._user, this._electionId, {Key? key})
-      : super(key: key);
+  const ElectionShowWidget(this._electionId, {Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) => NetworkAsyncWidget<Election>(
-        valueFactory: _downloadFirstElection,
-        waitingText: 'Downloading election...',
-        builder: (ctx, data) => VoteWidget(_user, data),
+  Widget build(BuildContext context) => Consumer<FirebaseAuthModel>(
+        builder: (ctx, value, _) => NetworkAsyncWidget<Election>(
+          valueFactory: () => _downloadFirstElection(value),
+          waitingText: 'Downloading election...',
+          builder: (ctx, data) => VoteWidget(value, data),
+        ),
       );
 
-  Future<Election> _downloadFirstElection() async {
-    final json = await getJson(_user, 'api/elections/$_electionId/')
+  Future<Election> _downloadFirstElection(FirebaseAuthModel _user) async {
+    final json = await _user.sendJson('GET', 'api/elections/$_electionId/')
         as Map<String, dynamic>;
 
     return Election.fromJson(json);
