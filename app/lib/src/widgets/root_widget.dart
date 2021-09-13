@@ -10,27 +10,27 @@ class RootWidget extends StatelessWidget {
   Widget build(BuildContext context) => Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ElevatedButton(
-            onPressed: _onSignIn,
-            child: const Text('Sign in with your Google account'),
-          ),
           Container(
             padding: const EdgeInsets.all(20),
-            child: const SelectableText.rich(
-              TextSpan(
-                children: [
-                  TextSpan(
-                    text: siteTitle,
-                    style: TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  TextSpan(text: _intro),
-                  TextSpan(text: '\n\n'),
-                  TextSpan(
-                    text: _cya,
-                    style: TextStyle(fontStyle: FontStyle.italic),
-                  ),
-                ],
-              ),
+            child: ElevatedButton(
+              onPressed: _onSignIn,
+              child: const Text('Sign in with your Google account'),
+            ),
+          ),
+          const SelectableText.rich(
+            TextSpan(
+              children: [
+                TextSpan(
+                  text: siteTitle,
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                TextSpan(text: _intro),
+                TextSpan(text: '\n\n'),
+                TextSpan(
+                  text: _cya,
+                  style: TextStyle(fontStyle: FontStyle.italic),
+                ),
+              ],
             ),
           )
         ],
