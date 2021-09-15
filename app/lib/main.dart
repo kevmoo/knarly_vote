@@ -6,6 +6,7 @@ import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
 import 'src/shared.dart';
+import 'src/theme_data.dart';
 import 'src/widgets/auth_widget.dart';
 import 'src/widgets/election_list_widget.dart';
 import 'src/widgets/election_show_widget.dart';
@@ -27,6 +28,7 @@ class _KnarlyApp extends StatelessWidget {
         child: Consumer<FirebaseAuthModel>(
           builder: (context, authModel, _) => MaterialApp.router(
             title: siteTitle,
+            theme: themeData,
             routerDelegate: RoutemasterDelegate(
               routesBuilder: (context) {
                 final user = authModel.user;
