@@ -53,5 +53,4 @@ _todo_ Sketching things out here, but this is incomplete at the moment.
 
 2. Web app
 
-   1. Build the web app. `flutter build web`.
-   1. Deploy web app. `firebase deploy`.
+   1. Build and deploy web app. `firebase deploy`.
