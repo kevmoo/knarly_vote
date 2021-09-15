@@ -30,7 +30,7 @@ class _NetworkAsyncWidgetState<T> extends State<NetworkAsyncWidget<T>> {
             return Center(
               child: Text(
                 snapshot.error.toString(),
-                style: const TextStyle(color: Colors.red),
+                style: TextStyle(color: Theme.of(context).errorColor),
               ),
             );
           }

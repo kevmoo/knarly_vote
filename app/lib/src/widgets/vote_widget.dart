@@ -30,13 +30,13 @@ class VoteWidget extends StatelessWidget {
                 style: const TextStyle(fontStyle: FontStyle.italic),
               ),
               if (model.state == UserVotingModelState.error)
-                const Padding(
-                  padding: EdgeInsets.all(8.0),
+                Padding(
+                  padding: const EdgeInsets.all(8.0),
                   child: Text(
                     'Check out the dev console. Reload?',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.red,
+                      color: Theme.of(context).errorColor,
                     ),
                   ),
                 ),
