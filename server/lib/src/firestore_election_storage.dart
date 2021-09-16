@@ -115,30 +115,23 @@ class FirestoreElectionStorage implements ElectionStorage {
 
     final election = electionDoc.toElection();
 
-    final ballots = <Ballot>[];
+    final ballots = await _withTransaction((p0) async {
+      final ballots = <Ballot>[];
+      String? nextPageToken;
+      do {
+        final ballotList = await _documents.list(
+          _electionDocumentPath(electionId),
+          'ballots',
+          pageToken: nextPageToken,
+          transaction: p0,
+        );
+        nextPageToken = ballotList.nextPageToken;
+        final documents = ballotList.documents ?? const [];
+        ballots.addAll(documents.map((e) => e.toBallot()));
+      } while (nextPageToken != null);
 
-    final transaction = await _documents.beginTransaction(
-      BeginTransactionRequest(
-        options: TransactionOptions(readOnly: ReadOnly()),
-      ),
-      _databaseId,
-    );
-    String? nextPageToken;
-    do {
-      final ballotList = await _documents.list(
-        _electionDocumentPath(electionId),
-        'ballots',
-        pageToken: nextPageToken,
-        transaction: transaction.transaction,
-      );
-      nextPageToken = ballotList.nextPageToken;
-      final documents = ballotList.documents ?? const [];
-      ballots.addAll(documents.map((e) => e.toBallot()));
-    } while (nextPageToken != null);
-    await _documents.commit(
-      CommitRequest(transaction: transaction.transaction),
-      _databaseId,
-    );
+      return ballots;
+    });
 
     final condorcetJson = getVoteJson(election, ballots);
 
@@ -209,6 +202,40 @@ class FirestoreElectionStorage implements ElectionStorage {
 
   ProjectsDatabasesDocumentsResource get _documents =>
       _firestore.projects.databases.documents;
+
+  /// Runs [action] within a transaction.
+  ///
+  /// If [action] succeeds, the transaction is committed.
+  /// Otherwise, the transaction in rolled back.
+  Future<T> _withTransaction<T>(
+    FutureOr<T> Function(String) action,
+  ) async {
+    final transaction = (await _documents.beginTransaction(
+      BeginTransactionRequest(
+        options: TransactionOptions(readOnly: ReadOnly()),
+      ),
+      _databaseId,
+    ))
+        .transaction!;
+    var success = false;
+    try {
+      final result = await action(transaction);
+      success = true;
+      return result;
+    } finally {
+      if (success) {
+        await _documents.commit(
+          CommitRequest(transaction: transaction),
+          _databaseId,
+        );
+      } else {
+        await _documents.rollback(
+          RollbackRequest(transaction: transaction),
+          _databaseId,
+        );
+      }
+    }
+  }
 }
 
 Value valueFromLiteral(Object? literal) {
