@@ -41,7 +41,7 @@ firebase.analytics();
   Future<Response> listElections(Request request) async {
     final userId = await _jwtSubjectFromRequest(request);
 
-    return _okJsonResponse(await _storage.listElection(userId));
+    return _okJsonResponse(await _storage.listElections(userId));
   }
 
   @Route.get('/api/elections/<electionId>/')

@@ -39,7 +39,7 @@ class FirestoreElectionStorage implements ElectionStorage {
         _tasks = CloudTasksApi(_client);
 
   @override
-  Future<List<Election>> listElection(String userId) async {
+  Future<List<Election>> listElections(String userId) async {
     final result = await _documents.list(
       _documentsPath,
       rootCollectionName,

@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:knarly_common/knarly_common.dart';
 
 abstract class ElectionStorage {
-  FutureOr<List<Election>> listElection(String userId);
+  FutureOr<List<Election>> listElections(String userId);
 
   FutureOr<Election> getElection(String userId, String electionId);
 

@@ -9,7 +9,7 @@ class InMemoryElectionStorage implements ElectionStorage {
   final _inMemoryStorage = <String, List<String>>{};
 
   @override
-  List<Election> listElection(String userId) => [_defaultElection];
+  List<Election> listElections(String userId) => [_defaultElection];
 
   @override
   Ballot getBallot(String userId, String electionId) {
