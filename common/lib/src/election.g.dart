@@ -16,6 +16,29 @@ Map<String, dynamic> _$PlaceDataToJson(PlaceData instance) => <String, dynamic>{
       'candidates': instance.candidates,
     };
 
+ElectionPreview _$ElectionPreviewFromJson(Map<String, dynamic> json) =>
+    ElectionPreview(
+      id: json['id'] as String,
+      name: json['name'] as String,
+      description: json['description'] as String?,
+    );
+
+Map<String, dynamic> _$ElectionPreviewToJson(ElectionPreview instance) {
+  final val = <String, dynamic>{
+    'id': instance.id,
+    'name': instance.name,
+  };
+
+  void writeNotNull(String key, dynamic value) {
+    if (value != null) {
+      val[key] = value;
+    }
+  }
+
+  writeNotNull('description', instance.description);
+  return val;
+}
+
 Election _$ElectionFromJson(Map<String, dynamic> json) => Election(
       id: json['id'] as String,
       name: json['name'] as String,

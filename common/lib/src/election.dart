@@ -17,7 +17,7 @@ class PlaceData {
 }
 
 @JsonSerializable(includeIfNull: false)
-class Election {
+class ElectionPreview {
   // TODO: id MUST be a valid URI component
   final String id;
 
@@ -30,9 +30,6 @@ class Election {
 
   final String? description;
 
-  // candidates (String list of allowed values)
-  final Set<String> candidates;
-
   // state: draft, open, closed
 
   // ** Data validation **
@@ -40,20 +37,39 @@ class Election {
   // TODO: allowed twitter users?
   // TODO: restrict to one auth provider or one email domain?
 
-  Election({
+  ElectionPreview({
     required this.id,
     required this.name,
-    required Set<String> candidates,
     this.description,
-  }) : candidates = Set.unmodifiable(
+  });
+
+  factory ElectionPreview.fromJson(Map<String, dynamic> json) =>
+      _$ElectionPreviewFromJson(json);
+
+  Map<String, dynamic> toJson() => _$ElectionPreviewToJson(this);
+}
+
+@JsonSerializable(includeIfNull: false)
+class Election extends ElectionPreview {
+  // candidates (String list of allowed values)
+  final Set<String> candidates;
+
+  Election({
+    required String id,
+    required String name,
+    required Set<String> candidates,
+    String? description,
+  })  : candidates = Set.unmodifiable(
           candidates.toList()..sort(compareAsciiLowerCaseNatural),
-        ) {
+        ),
+        super(id: id, name: name, description: description) {
     _validCandidates(candidates, 'candidates');
   }
 
   factory Election.fromJson(Map<String, dynamic> json) =>
       _$ElectionFromJson(json);
 
+  @override
   Map<String, dynamic> toJson() => _$ElectionToJson(this);
 }
 

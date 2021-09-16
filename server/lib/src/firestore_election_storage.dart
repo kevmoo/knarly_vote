@@ -39,13 +39,13 @@ class FirestoreElectionStorage implements ElectionStorage {
         _tasks = CloudTasksApi(_client);
 
   @override
-  Future<List<Election>> listElections(String userId) async {
+  Future<List<ElectionPreview>> listElections(String userId) async {
     final result = await _documents.list(
       _documentsPath,
       rootCollectionName,
     );
 
-    return result.documents!.map((d) => d.toElection()).toList();
+    return result.documents!.map((d) => d.toElectionPreview()).toList();
   }
 
   @override
@@ -272,6 +272,14 @@ extension ValueExtention on Value {
 
 extension DocumentExtension on Document {
   String get id => name!.split('/').last;
+
+  ElectionPreview toElectionPreview() {
+    final map = fields!.literalValues;
+    return ElectionPreview(
+      id: id,
+      name: map['name'] as String,
+    );
+  }
 
   Election toElection() {
     final map = fields!.literalValues;

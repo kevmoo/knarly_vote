@@ -12,10 +12,10 @@ class ElectionListWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) => Consumer<FirebaseAuthModel>(
-        builder: (ctx, value, _) => NetworkAsyncWidget<List<Election>>(
+        builder: (ctx, value, _) => NetworkAsyncWidget<List<ElectionPreview>>(
           valueFactory: () => _listElections(value),
           waitingText: 'Downloading elections...',
-          builder: (ctx, List<Election> data) => Column(
+          builder: (ctx, data) => Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               for (var index = 0; index < data.length; index++)
@@ -33,11 +33,13 @@ class ElectionListWidget extends StatelessWidget {
       );
 }
 
-Future<List<Election>> _listElections(FirebaseAuthModel usr) async {
+Future<List<ElectionPreview>> _listElections(FirebaseAuthModel usr) async {
   final json = await usr.sendJson('GET', 'api/elections/') as List;
   if (json.isEmpty) {
     throw StateError('No values returned!');
   }
 
-  return json.map((e) => Election.fromJson(e as Map<String, dynamic>)).toList();
+  return json
+      .map((e) => ElectionPreview.fromJson(e as Map<String, dynamic>))
+      .toList();
 }
