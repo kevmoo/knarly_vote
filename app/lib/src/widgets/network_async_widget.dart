@@ -2,6 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
+import '../network_exception.dart';
+
 class NetworkAsyncWidget<T> extends StatefulWidget {
   final Future<T> Function() valueFactory;
   final String waitingText;
@@ -26,12 +28,27 @@ class _NetworkAsyncWidgetState<T> extends State<NetworkAsyncWidget<T>> {
         future: _future,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            // TODO: Probably could do something a bit better here...
-            return Center(
-              child: Text(
-                snapshot.error.toString(),
-                style: TextStyle(color: Theme.of(context).errorColor),
-              ),
+            final error = snapshot.error;
+
+            String text;
+            if (error is NetworkException) {
+              text = '''
+${error.message}
+
+Status code: ${error.statusCode}
+Url: ${error.uri}''';
+
+              if (error.cloudTraceContext != null) {
+                text += '\nCloud trace context: ${error.cloudTraceContext}';
+              }
+            } else {
+              text = error.toString();
+            }
+
+            return SelectableText(
+              text,
+              textScaleFactor: 1.4,
+              style: TextStyle(color: Theme.of(context).errorColor),
             );
           }
 

@@ -77,10 +77,10 @@ class FirebaseAuthModel extends ChangeNotifier {
     );
     if (response.statusCode != 200) {
       throw NetworkException(
-        'Bad response from service! ${response.statusCode}. '
-        '${response.body}',
+        'Bad response from service. ${response.body}',
         statusCode: response.statusCode,
         uri: uri,
+        cloudTraceContext: response.headers['x-cloud-trace-context'],
       );
     }
 
