@@ -2,6 +2,43 @@ import 'dart:async';
 
 import 'package:googleapis/firestore/v1.dart';
 
+Value valueFromLiteral(Object? literal) {
+  if (literal is List) {
+    return Value(
+      arrayValue: ArrayValue(values: literal.map(valueFromLiteral).toList()),
+    );
+  }
+
+  if (literal is String) {
+    return Value(stringValue: literal);
+  }
+
+  if (literal is int) {
+    return Value(integerValue: literal.toString());
+  }
+
+  if (literal is List) {
+    return Value(
+      arrayValue: ArrayValue(
+        values:
+            List.generate(literal.length, (i) => valueFromLiteral(literal[i])),
+      ),
+    );
+  }
+
+  if (literal is Map) {
+    return Value(
+      mapValue: MapValue(
+        fields: literal.map(
+          (key, value) => MapEntry(key as String, valueFromLiteral(value)),
+        ),
+      ),
+    );
+  }
+
+  throw UnimplementedError('For "$literal" - (${literal.runtimeType})');
+}
+
 extension ValueExtention on Value {
   Object? get literal {
     if (stringValue != null) {
