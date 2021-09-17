@@ -6,16 +6,6 @@ part of 'election.dart';
 // JsonSerializableGenerator
 // **************************************************************************
 
-PlaceData _$PlaceDataFromJson(Map<String, dynamic> json) => PlaceData(
-      json['place'] as int,
-      (json['candidates'] as List<dynamic>).map((e) => e as String).toList(),
-    );
-
-Map<String, dynamic> _$PlaceDataToJson(PlaceData instance) => <String, dynamic>{
-      'place': instance.place,
-      'candidates': instance.candidates,
-    };
-
 ElectionPreview _$ElectionPreviewFromJson(Map<String, dynamic> json) =>
     ElectionPreview(
       id: json['id'] as String,

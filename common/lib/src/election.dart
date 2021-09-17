@@ -3,19 +3,6 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'election.g.dart';
 
-@JsonSerializable(explicitToJson: true)
-class PlaceData {
-  final int place;
-  final List<String> candidates;
-
-  PlaceData(this.place, this.candidates);
-
-  factory PlaceData.fromJson(Map<String, dynamic> json) =>
-      _$PlaceDataFromJson(json);
-
-  Map<String, dynamic> toJson() => _$PlaceDataToJson(this);
-}
-
 @JsonSerializable(includeIfNull: false)
 class ElectionPreview {
   // TODO: id MUST be a valid URI component
