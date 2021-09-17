@@ -63,7 +63,7 @@ class FirestoreElectionStorage implements ElectionStorage {
             // Find the total ballot count
             //
             final countData = await _documents.getOrNull(
-              '$_documentsPath/${electionResultPath(doc.id)}',
+              _resultsPath(doc.id),
               mask_fieldPaths: ['ballotCount'],
             );
             final ballotCount =
@@ -146,42 +146,32 @@ class FirestoreElectionStorage implements ElectionStorage {
 
     final election = electionDoc.toElection();
 
-    final ballots = await _withTransaction((p0) async {
-      final ballots = <Ballot>[];
-      String? nextPageToken;
-      do {
-        final ballotList = await _documents.list(
-          _electionDocumentPath(electionId),
-          'ballots',
-          pageToken: nextPageToken,
-          transaction: p0,
-        );
-        nextPageToken = ballotList.nextPageToken;
-        final documents = ballotList.documents ?? const [];
-        ballots.addAll(documents.map((e) => e.toBallot()));
-      } while (nextPageToken != null);
+    final ballots = await _withTransaction(
+      (tx) => _documents
+          .listAll(
+            _electionDocumentPath(electionId),
+            'ballots',
+            transaction: tx,
+          )
+          .expand((ballotList) => ballotList.map((e) => e.toBallot()))
+          .toList(),
+    );
 
-      return ballots;
-    });
+    if (ballots.isEmpty) {
+      await _documents.delete(_resultsPath(electionId));
+      return;
+    }
 
     final condorcetJson = getVoteJson(election, ballots);
 
-    final document = await _documents.patch(
+    await _documents.patch(
       Document(
         fields: {
           'places': valueFromLiteral(condorcetJson),
           'ballotCount': valueFromLiteral(ballots.length),
         },
       ),
-      '$_documentsPath/${electionResultPath(electionId)}',
-    );
-
-    print(
-      prettyJson({
-        'name': document.name,
-        'createTime': document.createTime,
-        'updateTime': document.updateTime,
-      }),
+      _resultsPath(electionId),
     );
   }
 
@@ -224,6 +214,9 @@ class FirestoreElectionStorage implements ElectionStorage {
   String get _databaseId => 'projects/${config.projectId}/databases/(default)';
 
   String get _documentsPath => '$_databaseId/documents';
+
+  String _resultsPath(String electionId) =>
+      '$_documentsPath/${electionResultPath(electionId)}';
 
   String _electionDocumentPath(String electionId) =>
       '$_documentsPath/${electionDocumentPath(electionId)}';

@@ -50,13 +50,19 @@ class VoteWidget extends StatelessWidget {
               _valueProviderConsumer<ElectionResultModel>(
                 value: electionModel,
                 builder: (_, model, __) {
+                  final ballotCount = model.ballotCount;
                   final result = model.value;
                   if (result == null) {
+                    assert(ballotCount == null || ballotCount == 0);
+                    if (ballotCount == 0) {
+                      return const Text(
+                        'No votes have been cast.',
+                      );
+                    }
                     return const Text(
                       'Waiting for result to be calculated...',
                     );
                   }
-                  final ballotCount = model.ballotCount;
                   return Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [

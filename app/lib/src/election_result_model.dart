@@ -12,14 +12,23 @@ class ElectionResultModel extends ChangeNotifier
   CondorcetElectionResult<String>? _value;
 
   int? _ballotCount;
+
+  /// The number of cast ballots or `null` if still waiting for results.
   int? get ballotCount => _ballotCount;
 
   ElectionResultModel(this.electionId);
 
   void _listen(DocumentSnapshot event) {
-    final data = event.data() as Map<String, dynamic>;
-    _value = _decode(data);
-    _ballotCount = data['ballotCount'] as int?;
+    final data = event.data() as Map<String, dynamic>?;
+
+    if (data == null) {
+      // No votes have been cast!
+      _value = null;
+      _ballotCount = 0;
+    } else {
+      _value = _decode(data);
+      _ballotCount = data['ballotCount'] as int?;
+    }
 
     notifyListeners();
   }
