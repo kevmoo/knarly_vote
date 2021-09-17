@@ -3,8 +3,7 @@ import 'package:json_annotation/json_annotation.dart';
 
 part 'election.g.dart';
 
-@JsonSerializable(includeIfNull: false)
-class ElectionPreview {
+abstract class _ElectionCore {
   // TODO: id MUST be a valid URI component
   final String id;
 
@@ -24,11 +23,20 @@ class ElectionPreview {
   // TODO: allowed twitter users?
   // TODO: restrict to one auth provider or one email domain?
 
-  ElectionPreview({
+  _ElectionCore({
     required this.id,
     required this.name,
     this.description,
   });
+}
+
+@JsonSerializable(includeIfNull: false)
+class ElectionPreview extends _ElectionCore {
+  ElectionPreview({
+    required String id,
+    required String name,
+    String? description,
+  }) : super(id: id, name: name, description: description);
 
   factory ElectionPreview.fromJson(Map<String, dynamic> json) =>
       _$ElectionPreviewFromJson(json);
@@ -37,7 +45,7 @@ class ElectionPreview {
 }
 
 @JsonSerializable(includeIfNull: false)
-class Election extends ElectionPreview {
+class Election extends _ElectionCore {
   // candidates (String list of allowed values)
   final Set<String> candidates;
 
@@ -56,7 +64,6 @@ class Election extends ElectionPreview {
   factory Election.fromJson(Map<String, dynamic> json) =>
       _$ElectionFromJson(json);
 
-  @override
   Map<String, dynamic> toJson() => _$ElectionToJson(this);
 }
 
