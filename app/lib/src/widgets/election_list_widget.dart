@@ -15,19 +15,46 @@ class ElectionListWidget extends StatelessWidget {
         builder: (ctx, value, _) => NetworkAsyncWidget<List<ElectionPreview>>(
           valueFactory: () => _listElections(value),
           waitingText: 'Downloading elections...',
-          builder: (ctx, data) => Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              for (var index = 0; index < data.length; index++)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: ElevatedButton(
-                    onPressed: () =>
-                        Routemaster.of(context).push(data[index].id),
-                    child: Text(data[index].name),
-                  ),
-                ),
-            ],
+          builder: (ctx, data) => Table(
+            defaultVerticalAlignment: TableCellVerticalAlignment.middle,
+            textBaseline: TextBaseline.alphabetic,
+            columnWidths: {
+              0: const FractionColumnWidth(.7),
+              1: const FlexColumnWidth(),
+              2: const FlexColumnWidth(),
+            },
+            children: List.generate(
+              data.length + 1,
+              (index) {
+                if (index == 0) {
+                  return const TableRow(
+                    children: [
+                      Center(child: Text('Election')),
+                      Center(child: Text('Voted')),
+                      Center(child: Text('Total votes')),
+                    ],
+                  );
+                }
+                final item = data[index - 1];
+                return TableRow(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: ElevatedButton(
+                        onPressed: () => Routemaster.of(context).push(item.id),
+                        child: Text(item.name),
+                      ),
+                    ),
+                    Center(
+                      child: Text(item.userVoted ? '✔️' : ''),
+                    ),
+                    Center(
+                      child: Text(item.ballotCount.toString()),
+                    ),
+                  ],
+                );
+              },
+            ),
           ),
         ),
       );
