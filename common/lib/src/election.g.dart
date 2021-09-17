@@ -10,6 +10,8 @@ ElectionPreview _$ElectionPreviewFromJson(Map<String, dynamic> json) =>
     ElectionPreview(
       id: json['id'] as String,
       name: json['name'] as String,
+      userVoted: json['userVoted'] as bool,
+      ballotCount: json['ballotCount'] as int,
       description: json['description'] as String?,
     );
 
@@ -26,6 +28,8 @@ Map<String, dynamic> _$ElectionPreviewToJson(ElectionPreview instance) {
   }
 
   writeNotNull('description', instance.description);
+  val['userVoted'] = instance.userVoted;
+  val['ballotCount'] = instance.ballotCount;
   return val;
 }
 

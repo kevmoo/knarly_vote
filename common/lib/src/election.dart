@@ -32,9 +32,14 @@ abstract class _ElectionCore {
 
 @JsonSerializable(includeIfNull: false)
 class ElectionPreview extends _ElectionCore {
+  final bool userVoted;
+  final int ballotCount;
+
   ElectionPreview({
     required String id,
     required String name,
+    required this.userVoted,
+    required this.ballotCount,
     String? description,
   }) : super(id: id, name: name, description: description);
 

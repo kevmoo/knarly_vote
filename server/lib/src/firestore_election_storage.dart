@@ -7,6 +7,7 @@ import 'package:googleapis_auth/auth_io.dart';
 import 'package:knarly_common/knarly_common.dart';
 
 import 'election_storage.dart';
+import 'firestore_extentions.dart';
 import 'header_access_middleware.dart';
 import 'service_config.dart';
 import 'service_exception.dart';
@@ -39,30 +40,60 @@ class FirestoreElectionStorage implements ElectionStorage {
         _tasks = CloudTasksApi(_client);
 
   @override
-  Future<List<ElectionPreview>> listElections(String userId) async {
-    final result = await _documents.list(
-      _documentsPath,
-      rootCollectionName,
-    );
+  Future<List<ElectionPreview>> listElections(String userId) async =>
+      await _withTransaction<List<ElectionPreview>>(
+        (p0) => _documents
+            .listAll(
+          _documentsPath,
+          rootCollectionName,
+          transaction: p0,
+        )
+            .asyncExpand((entry) async* {
+          for (var doc in entry) {
+            //
+            // Figure out if the user voted
+            //
+            final userBallot = await _documents.getOrNull(
+              _ballotPath(doc.id, userId),
+              mask_fieldPaths: ['noop'],
+            );
+            final userVoted = userBallot != null;
 
-    return result.documents!.map((d) => d.toElectionPreview()).toList();
-  }
+            //
+            // Find the total ballot count
+            //
+            final countData = await _documents.getOrNull(
+              '$_documentsPath/${electionResultPath(doc.id)}',
+              mask_fieldPaths: ['ballotCount'],
+            );
+            final ballotCount =
+                countData?.literalValues!['ballotCount'] as int? ?? 0;
+
+            final electionFields = doc.literalValues!;
+
+            yield ElectionPreview(
+              id: doc.id,
+              name: electionFields['name'] as String,
+              description: electionFields['description'] as String?,
+              ballotCount: ballotCount,
+              userVoted: userVoted,
+            );
+          }
+        }).toList(),
+      );
 
   @override
   FutureOr<Election> getElection(String userId, String electionId) async {
-    try {
-      final result = await _documents.get(_electionDocumentPath(electionId));
+    final result =
+        await _documents.getOrNull(_electionDocumentPath(electionId));
 
-      return result.toElection();
-    } on DetailedApiRequestError catch (e) {
-      if (e.status == 404) {
-        throw ServiceException(
-          ServiceExceptionKind.resourceNotFound,
-          'Election does not exist or user does not have access to it.',
-        );
-      }
-      rethrow;
+    if (result == null) {
+      throw ServiceException(
+        ServiceExceptionKind.resourceNotFound,
+        'Election does not exist or user does not have access to it.',
+      );
     }
+    return result.toElection();
   }
 
   @override
@@ -203,39 +234,10 @@ class FirestoreElectionStorage implements ElectionStorage {
   ProjectsDatabasesDocumentsResource get _documents =>
       _firestore.projects.databases.documents;
 
-  /// Runs [action] within a transaction.
-  ///
-  /// If [action] succeeds, the transaction is committed.
-  /// Otherwise, the transaction in rolled back.
   Future<T> _withTransaction<T>(
     FutureOr<T> Function(String) action,
-  ) async {
-    final transaction = (await _documents.beginTransaction(
-      BeginTransactionRequest(
-        options: TransactionOptions(readOnly: ReadOnly()),
-      ),
-      _databaseId,
-    ))
-        .transaction!;
-    var success = false;
-    try {
-      final result = await action(transaction);
-      success = true;
-      return result;
-    } finally {
-      if (success) {
-        await _documents.commit(
-          CommitRequest(transaction: transaction),
-          _databaseId,
-        );
-      } else {
-        await _documents.rollback(
-          RollbackRequest(transaction: transaction),
-          _databaseId,
-        );
-      }
-    }
-  }
+  ) =>
+      _documents.withTransaction(action, _databaseId);
 }
 
 Value valueFromLiteral(Object? literal) {
@@ -275,56 +277,19 @@ Value valueFromLiteral(Object? literal) {
   throw UnimplementedError('For "$literal" - (${literal.runtimeType})');
 }
 
-extension on Value {
-  Object? get literal {
-    if (stringValue != null) {
-      return stringValue!;
-    }
-
-    if (mapValue != null) {
-      return mapValue!.fields!.literalValues;
-    }
-
-    if (arrayValue != null) {
-      return arrayValue!.values?.map((e) => e.literal).toList() ?? [];
-    }
-
-    if (nullValue != null) {
-      return null;
-    }
-
-    throw UnimplementedError(toJson().toString());
-  }
-}
-
 extension on Document {
-  String get id => name!.split('/').last;
-
-  ElectionPreview toElectionPreview() {
-    final map = fields!.literalValues;
-    return ElectionPreview(
-      id: id,
-      name: map['name'] as String,
-    );
-  }
-
   Election toElection() {
-    final map = fields!.literalValues;
+    final map = literalValues!;
     return Election(
       id: id,
       name: map['name'] as String,
       candidates: (map['candidates'] as Map<String, dynamic>).keys.toSet(),
+      description: map['description'] as String?,
     );
   }
 
   Ballot toBallot() => Ballot(
         (fields?['rank']?.literal as List? ?? []).cast<String>(),
-      );
-}
-
-extension on Map<String, Value> {
-  Map<String, dynamic> get literalValues => Map<String, dynamic>.fromEntries(
-        entries.map((e) => MapEntry(e.key, e.value.literal)),
       );
 }
 
