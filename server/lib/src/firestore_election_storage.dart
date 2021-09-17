@@ -275,7 +275,7 @@ Value valueFromLiteral(Object? literal) {
   throw UnimplementedError('For "$literal" - (${literal.runtimeType})');
 }
 
-extension ValueExtention on Value {
+extension on Value {
   Object? get literal {
     if (stringValue != null) {
       return stringValue!;
@@ -297,7 +297,7 @@ extension ValueExtention on Value {
   }
 }
 
-extension DocumentExtension on Document {
+extension on Document {
   String get id => name!.split('/').last;
 
   ElectionPreview toElectionPreview() {
