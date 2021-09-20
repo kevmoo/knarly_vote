@@ -1,6 +1,7 @@
 # See details in `lib/src/service_config.dart` for the needed values.
 apiKey: ???
 projectId: ???
+authDomain: ??? (should usually be [projectId].firebaseapp.com)
 electionUpdateTaskLocation: ???
 electionUpdateTaskQueueId: ???
 serviceAccountEmail: ???

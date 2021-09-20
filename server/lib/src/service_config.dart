@@ -15,6 +15,9 @@ class ServiceConfig {
   /// https://firebase.google.com/docs/projects/learn-more#project-id
   final String projectId;
 
+  /// https://cloud.google.com/identity-platform/docs/show-custom-domain
+  final String authDomain;
+
   /// The `LOCATION_ID` need as part of the task request parent:
   /// `projects/PROJECT_ID/locations/LOCATION_ID/queues/QUEUE_ID`.
   final String electionUpdateTaskLocation;
@@ -32,6 +35,7 @@ class ServiceConfig {
 
   const ServiceConfig({
     required this.projectId,
+    required this.authDomain,
     required this.apiKey,
     required this.electionUpdateTaskLocation,
     required this.electionUpdateTaskQueueId,
@@ -46,7 +50,7 @@ class ServiceConfig {
 
   Map<String, String> firebaseConfig() => {
         'apiKey': apiKey,
-        'authDomain': '$projectId.firebaseapp.com',
+        'authDomain': authDomain,
         'projectId': projectId,
         //'databaseURL': 'https://$projectId.firebaseio.com',
         //'storageBucket': '$projectId.appspot.com',
@@ -92,6 +96,7 @@ class ServiceConfig {
 const _configKeys = {
   'apiKey',
   'projectId',
+  'authDomain',
   'electionUpdateTaskLocation',
   'electionUpdateTaskQueueId',
   'serviceAccountEmail',
