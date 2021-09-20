@@ -36,7 +36,7 @@ class SignedInUserWidget extends StatelessWidget {
     try {
       await FirebaseAuth.instance.signOut();
     } catch (error) {
-      print(error);
+      print('Caught an error during Firebase sign-out: $error');
     }
   }
 }

@@ -5,6 +5,7 @@ import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
+import 'src/observer.dart';
 import 'src/shared.dart';
 import 'src/theme_data.dart';
 import 'src/widgets/auth_widget.dart';
@@ -38,6 +39,7 @@ class _KnarlyApp extends StatelessWidget {
 
                 return _loggedInRouteMap(user);
               },
+              observers: [observer],
             ),
             routeInformationParser: const RoutemasterParser(),
           ),
@@ -48,6 +50,7 @@ class _KnarlyApp extends StatelessWidget {
     onUnknownRoute: (route) => const Redirect('/'),
     routes: {
       '/': (_) => _scaffold(
+            name: 'Sign-in',
             key: _rootKey,
             child: const RootWidget(),
           )
@@ -61,39 +64,48 @@ class _KnarlyApp extends StatelessWidget {
         },
         routes: {
           '/elections': (_) => _scaffoldSignedIn(
+                name: 'List Elections',
                 key: ObjectKey('${user.uid}-election-list'),
                 user: user,
                 child: const ElectionListWidget(),
               ),
-          '/elections/:id': (route) => _scaffoldSignedIn(
-                key: ObjectKey('${user.uid}-election-show'),
-                user: user,
-                child: ElectionShowWidget(route.pathParameters['id']!),
-              ),
+          '/elections/:id': (route) {
+            final electionId = route.pathParameters['id'];
+            return _scaffoldSignedIn(
+              name: 'Show Election - $electionId',
+              key: ObjectKey('${user.uid}-election-show'),
+              user: user,
+              child: ElectionShowWidget(electionId!),
+            );
+          },
         },
       );
 
   MaterialPage _scaffoldSignedIn({
+    required String name,
     required User user,
     required Widget child,
     required LocalKey key,
   }) =>
       _scaffold(
+        name: name,
+        key: key,
         child: SignedInUserWidget(
           user: user,
           child: child,
         ),
-        key: key,
       );
 
   static final _rootKey = UniqueKey();
 }
 
 MaterialPage _scaffold({
+  required String name,
   required LocalKey key,
   required Widget child,
 }) =>
     MaterialPage(
+      name: name,
       key: key,
       maintainState: false,
       child: _ScaffoldWidget(child: child),

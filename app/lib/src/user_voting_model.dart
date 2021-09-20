@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:flutter/foundation.dart';
 import 'package:knarly_common/knarly_common.dart';
 
@@ -87,6 +88,11 @@ class UserVotingModel extends ChangeNotifier {
     final uri = Uri.parse('api/ballots/${_election.id}/');
 
     final newRank = _voteModel?.rank.toList();
+
+    FirebaseAnalytics().logEvent(
+      name: 'ballot updated',
+      parameters: {'election_id': _election.id},
+    ).ignore();
 
     _stackedUpdateBallotsCount++;
     try {

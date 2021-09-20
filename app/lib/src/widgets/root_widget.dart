@@ -1,3 +1,4 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -40,8 +41,9 @@ class RootWidget extends StatelessWidget {
     try {
       final googleProvider = GoogleAuthProvider()..addScope('email');
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
+      FirebaseAnalytics().logLogin(loginMethod: 'google').ignore();
     } catch (error) {
-      print(error);
+      print('Error caught during Firebase sign-in: $error');
     }
   }
 }
