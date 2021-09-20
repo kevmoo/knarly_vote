@@ -8,86 +8,105 @@ import '../election_result_model.dart';
 import '../user_voting_model.dart';
 import '../vote_model.dart';
 
-class VoteWidget extends StatelessWidget {
-  final FirebaseAuthModel _user;
-  final Election _data;
+class VoteWidget extends StatefulWidget {
+  final FirebaseAuthModel user;
+  final Election data;
 
-  VoteWidget(this._user, this._data);
+  const VoteWidget({Key? key, required this.user, required this.data})
+      : super(key: key);
 
   @override
-  Widget build(BuildContext context) =>
-      _createProviderConsumer<UserVotingModel>(
-        create: (_) => UserVotingModel(_user, _data),
-        builder: (context, model, __) {
-          final electionModel = model.electionResultModel;
-          final voteModel = model.voteModel;
+  _VoteWidgetState createState() => _VoteWidgetState();
+}
 
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'State: ${model.state.name}',
-                style: const TextStyle(fontStyle: FontStyle.italic),
+class _VoteWidgetState extends State<VoteWidget> {
+  late final _model = UserVotingModel(widget.user, widget.data);
+
+  @override
+  void initState() {
+    _model.addListener(_modelChanged);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _model.removeListener(_modelChanged);
+    super.dispose();
+  }
+
+  void _modelChanged() {
+    setState(() {});
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final voteModel = _model.voteModel;
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          'State: ${_model.state.name}',
+          style: const TextStyle(fontStyle: FontStyle.italic),
+        ),
+        if (_model.state == UserVotingModelState.error)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Text(
+              'Check out the dev console. Reload?',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).errorColor,
               ),
-              if (model.state == UserVotingModelState.error)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    'Check out the dev console. Reload?',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).errorColor,
-                    ),
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Text(
+            _model.electionName,
+            textScaleFactor: 2,
+          ),
+        ),
+        _valueProviderConsumer<ElectionResultModel>(
+          value: _model.electionResultModel,
+          builder: (_, model, __) {
+            final ballotCount = model.ballotCount;
+            final result = model.value;
+            if (result == null) {
+              assert(ballotCount == null || ballotCount == 0);
+              if (ballotCount == 0) {
+                return const Text(
+                  'No votes have been cast.',
+                );
+              }
+              return const Text(
+                'Waiting for result to be calculated...',
+              );
+            }
+            return Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                if (ballotCount != null)
+                  Text(
+                    'All cast ballots: $ballotCount',
+                    textScaleFactor: 1.5,
                   ),
-                ),
-              Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Text(
-                  model.electionName,
-                  textScaleFactor: 2,
-                ),
-              ),
-              _valueProviderConsumer<ElectionResultModel>(
-                value: electionModel,
-                builder: (_, model, __) {
-                  final ballotCount = model.ballotCount;
-                  final result = model.value;
-                  if (result == null) {
-                    assert(ballotCount == null || ballotCount == 0);
-                    if (ballotCount == 0) {
-                      return const Text(
-                        'No votes have been cast.',
-                      );
-                    }
-                    return const Text(
-                      'Waiting for result to be calculated...',
-                    );
-                  }
-                  return Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      if (ballotCount != null)
-                        Text(
-                          'All cast ballots: $ballotCount',
-                          textScaleFactor: 1.5,
-                        ),
-                      CondorcetElectionResultWidget(result),
-                    ],
-                  );
-                },
-              ),
-              if (voteModel != null)
-                Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: _valueProviderConsumer<VoteModel<String>>(
-                    value: voteModel,
-                    builder: _buildLists,
-                  ),
-                ),
-            ],
-          );
-        },
-      );
+                CondorcetElectionResultWidget(result),
+              ],
+            );
+          },
+        ),
+        if (voteModel != null)
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: _valueProviderConsumer<VoteModel<String>>(
+              value: voteModel,
+              builder: _buildLists,
+            ),
+          ),
+      ],
+    );
+  }
 }
 
 Widget _buildLists(BuildContext _, VoteModel<String> model, __) => Row(
@@ -199,20 +218,6 @@ Widget _createOrEmpty<T>(
 }
 
 const _listViewPadding = EdgeInsets.all(8);
-
-Widget _createProviderConsumer<T extends ChangeNotifier>({
-  required Create<T> create,
-  required Widget Function(
-    BuildContext context,
-    T value,
-    Widget? child,
-  )
-      builder,
-}) =>
-    ChangeNotifierProvider<T>(
-      create: create,
-      child: Consumer<T>(builder: builder),
-    );
 
 Widget _valueProviderConsumer<T extends ChangeNotifier>({
   required T value,
