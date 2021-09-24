@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:provider/provider.dart';
 import 'package:routemaster/routemaster.dart';
