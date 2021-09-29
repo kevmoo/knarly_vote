@@ -91,7 +91,7 @@ class _VoteWidgetState extends State<VoteWidget> {
                     'All cast ballots: $ballotCount',
                     textScaleFactor: 1.5,
                   ),
-                CondorcetElectionResultWidget(result),
+                CondorcetElectionResultWidget(election: result),
               ],
             );
           },
