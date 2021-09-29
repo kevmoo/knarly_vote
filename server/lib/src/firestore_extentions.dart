@@ -107,8 +107,6 @@ extension ProjectsDatabasesDocumentsResourceExtension
     String? transaction,
   }) async* {
     String? nextPageToken;
-    //var page = 0;
-    //print('-listall');
     do {
       final result = await list(
         parent,
@@ -118,7 +116,6 @@ extension ProjectsDatabasesDocumentsResourceExtension
         transaction: transaction,
       );
       nextPageToken = result.nextPageToken;
-      //print('-listall page ${++page}');
       yield result.documents!;
     } while (nextPageToken != null);
   }
@@ -131,8 +128,6 @@ extension ProjectsDatabasesDocumentsResourceExtension
     FutureOr<T> Function(String) action,
     String database,
   ) async {
-    //print('-tx starting');
-    //final stopwatch = Stopwatch()..start();
     final transaction = (await beginTransaction(
       BeginTransactionRequest(
         options: TransactionOptions(readOnly: ReadOnly()),
@@ -140,11 +135,9 @@ extension ProjectsDatabasesDocumentsResourceExtension
       database,
     ))
         .transaction!;
-    //print('-tx acquired - ${stopwatch.elapsedMilliseconds}');
     var success = false;
     try {
       final result = await action(transaction);
-      //print('-tx action finished - ${stopwatch.elapsedMilliseconds}');
       success = true;
       return result;
     } finally {
@@ -159,7 +152,6 @@ extension ProjectsDatabasesDocumentsResourceExtension
           database,
         );
       }
-      //print('-tx finished - ${stopwatch.elapsedMilliseconds}');
     }
   }
 }
