@@ -93,7 +93,7 @@ firebase.analytics();
     if (queueName != config.electionUpdateTaskQueueId) {
       throw ServiceException(
         ServiceExceptionKind.badUpdateRequest,
-        'We have the wrong task queue. Got "$queueName", expected '
+        'Bad value for `$queueNameHeader` header. Got "$queueName", expected '
         '"${config.electionUpdateTaskQueueId}"',
       );
     }
