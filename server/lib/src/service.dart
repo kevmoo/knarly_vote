@@ -97,10 +97,9 @@ firebase.analytics();
     }
 
     if (request.requestedUri.isScheme('https')) {
-      final token = await _jwtFromRequest(request);
-      print(prettyJson(token.claims));
+      await _jwtFromRequest(request, expectServiceRequest: true);
     } else {
-      print('* Allowing local request to ${request.requestedUri}');
+      print('* Not HTTPS - assuming local request to ${request.requestedUri}');
     }
 
     await _storage.updateElection(electionId);
@@ -111,7 +110,7 @@ firebase.analytics();
   Router get router => _$VoteServiceRouter(this);
 
   Future<String> _jwtSubjectFromRequest(Request request) async {
-    final jwt = await _jwtFromRequest(request);
+    final jwt = await _jwtFromRequest(request, expectServiceRequest: false);
 
     final hasAudience = jwt.claims.audience?.contains(_projectId);
 
@@ -124,7 +123,10 @@ firebase.analytics();
     return jwt.claims.subject!;
   }
 
-  Future<JsonWebToken> _jwtFromRequest(Request request) async {
+  Future<JsonWebToken> _jwtFromRequest(
+    Request request, {
+    required bool expectServiceRequest,
+  }) async {
     JsonWebToken? jwt;
     try {
       jwt = await tokenFromRequest(request, _store);
@@ -144,6 +146,18 @@ firebase.analytics();
     }
 
     if (jwt.isVerified == true) {
+      if (expectServiceRequest) {
+        if (jwt.claims['email_verified'] == true &&
+            jwt.claims['email'] == config.serviceAccountEmail) {
+          return jwt;
+        }
+
+        print(prettyJson(jwt.claims));
+        throw ServiceException.authorizationTokenValidation(
+          'Expected a verified email associated with the configured service '
+          'account.',
+        );
+      }
       return jwt;
     }
 
