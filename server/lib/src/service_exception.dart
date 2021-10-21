@@ -4,16 +4,27 @@ class ServiceException implements Exception {
   final ServiceExceptionKind kind;
   final String message;
 
-  ServiceException(this.kind, this.message);
+  final Object? innerError;
+  final StackTrace? innerStack;
 
-  factory ServiceException.firebaseTokenValidation(String message) =>
-      ServiceException(ServiceExceptionKind.firebaseTokenValidation, message);
+  ServiceException(
+    this.kind,
+    this.message, {
+    this.innerError,
+    this.innerStack,
+  });
+
+  factory ServiceException.authorizationTokenValidation(String message) =>
+      ServiceException(
+        ServiceExceptionKind.authorizationTokenValidation,
+        message,
+      );
 
   int? get clientErrorStatusCode {
     switch (kind) {
       case ServiceExceptionKind.badUpdateRequest:
         return 400;
-      case ServiceExceptionKind.firebaseTokenValidation:
+      case ServiceExceptionKind.authorizationTokenValidation:
         return 401;
       case ServiceExceptionKind.resourceNotFound:
         return 404;
@@ -26,7 +37,7 @@ class ServiceException implements Exception {
 
 enum ServiceExceptionKind {
   /// Issue with the client authorization header - HTTP 401
-  firebaseTokenValidation,
+  authorizationTokenValidation,
 
   /// Client tried to access an entity that does not exist or that does exist
   /// but the client does not have access to. - HTTP 404

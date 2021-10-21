@@ -4,12 +4,12 @@ import 'package:jose/jose.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_jwt_auth/shelf_jwt_auth.dart';
 import 'package:shelf_router/shelf_router.dart';
-import 'package:stack_trace/stack_trace.dart';
 
+import 'cloud_headers.dart';
 import 'election_storage.dart';
+import 'firestore_election_storage.dart';
 import 'service_config.dart';
 import 'service_exception.dart';
-import 'shared.dart';
 
 part 'service.g.dart';
 
@@ -86,33 +86,21 @@ firebase.analytics();
     Request request,
     String electionId,
   ) async {
-    const queueNameHeader = 'x-cloudtasks-queuename';
-
-    final queueName = request.headers[queueNameHeader];
+    final queueName = request.headers[googleCloudTaskQueueName];
 
     if (queueName != config.electionUpdateTaskQueueId) {
       throw ServiceException(
         ServiceExceptionKind.badUpdateRequest,
-        'Bad value for `$queueNameHeader` header. Got "$queueName", expected '
-        '"${config.electionUpdateTaskQueueId}"',
+        'Bad value for `$googleCloudTaskQueueName` header. Got "$queueName", '
+        'expected "${config.electionUpdateTaskQueueId}"',
       );
     }
 
-    try {
-      await _jwtFromRequest(request);
-    } catch (e, stack) {
-      // TODO: this should be an error!
-      print(
-        [
-          '--',
-          'Could not validate the authorization header',
-          '--',
-          e.runtimeType,
-          e,
-          Trace.from(stack).terse,
-        ].join('\n'),
-      );
-      debugPrintRequestHeaders(request);
+    if (request.requestedUri.isScheme('https')) {
+      final token = await _jwtFromRequest(request);
+      print(prettyJson(token));
+    } else {
+      print('* Allowing local request to ${request.requestedUri}');
     }
 
     await _storage.updateElection(electionId);
@@ -128,7 +116,7 @@ firebase.analytics();
     final hasAudience = jwt.claims.audience?.contains(_projectId);
 
     if (hasAudience != true) {
-      throw ServiceException.firebaseTokenValidation(
+      throw ServiceException.authorizationTokenValidation(
         'Audience does not contain expected project "$_projectId".',
       );
     }
@@ -137,15 +125,31 @@ firebase.analytics();
   }
 
   Future<JsonWebToken> _jwtFromRequest(Request request) async {
-    final jwt = await tokenFromRequest(request, _store);
-
-    if (jwt == null) {
-      throw ServiceException.firebaseTokenValidation('Could not validate auth');
+    JsonWebToken? jwt;
+    try {
+      jwt = await tokenFromRequest(request, _store);
+    } catch (error, stack) {
+      throw ServiceException(
+        ServiceExceptionKind.authorizationTokenValidation,
+        'Error parsing the authorization header.',
+        innerError: error,
+        innerStack: stack,
+      );
     }
 
-    assert(jwt.isVerified == true);
+    if (jwt == null) {
+      throw ServiceException.authorizationTokenValidation(
+        'No authorization information present.',
+      );
+    }
 
-    return jwt;
+    if (jwt.isVerified == true) {
+      return jwt;
+    }
+
+    throw ServiceException.authorizationTokenValidation(
+      'Token could not be verified.',
+    );
   }
 }
 

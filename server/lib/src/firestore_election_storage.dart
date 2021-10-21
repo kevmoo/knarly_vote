@@ -4,10 +4,12 @@ import 'dart:convert';
 import 'package:googleapis/cloudtasks/v2.dart';
 import 'package:googleapis/firestore/v1.dart';
 import 'package:googleapis_auth/auth_io.dart';
+import 'package:http/http.dart' as http;
 import 'package:knarly_common/knarly_common.dart';
 
+import 'cloud_headers.dart';
 import 'election_storage.dart';
-import 'firestore_extentions.dart';
+import 'firestore_extensions.dart';
 import 'header_access_middleware.dart';
 import 'service_config.dart';
 import 'service_exception.dart';
@@ -179,9 +181,9 @@ class FirestoreElectionStorage implements ElectionStorage {
     final updateUri = '${config.webHost}/api/elections/$electionId/update';
 
     if (updateUri.startsWith('https')) {
-      final traceParent = currentRequestHeaders!['traceparent'];
+      final traceParent = currentRequestHeaders?[traceParentHeaderName];
 
-      final resultTask = await _tasks.projects.locations.queues.tasks.create(
+      await _tasks.projects.locations.queues.tasks.create(
         CreateTaskRequest(
           task: Task(
             httpRequest: HttpRequest(
@@ -192,7 +194,7 @@ class FirestoreElectionStorage implements ElectionStorage {
               headers: traceParent == null
                   ? null
                   : {
-                      'traceparent':
+                      traceParentHeaderName:
                           TraceContext.parse(traceParent).randomize().toString()
                     },
             ),
@@ -200,13 +202,13 @@ class FirestoreElectionStorage implements ElectionStorage {
         ),
         'projects/${config.projectId}/locations/${config.electionUpdateTaskLocation}/queues/${config.electionUpdateTaskQueueId}',
       );
-      print(prettyJson(resultTask));
     } else {
-      final result = await _client.post(
+      await http.post(
         Uri.parse(updateUri),
-        headers: {'x-cloudtasks-queuename': config.electionUpdateTaskQueueId},
+        headers: {
+          googleCloudTaskQueueName: config.electionUpdateTaskQueueId,
+        },
       );
-      print(['Did a local update', result.statusCode, result.body].join('\t'));
     }
   }
 

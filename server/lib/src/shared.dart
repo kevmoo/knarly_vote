@@ -1,7 +1,12 @@
 import 'package:shelf/shelf.dart';
 
 void debugPrintRequestHeaders(Request request) {
-  print('${prettyMap(request.headers)}\n--end headers');
+  print(
+    '''
+***REQUEST HEADERS***
+${prettyMap(request.headers)}
+***END REQUEST HEADERS***''',
+  );
 }
 
 String prettyMap(Map<String, dynamic> input) =>

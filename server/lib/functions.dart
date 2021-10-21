@@ -56,7 +56,14 @@ Handler _middleware(Handler innerHandler) => (Request request) async {
       } on ServiceException catch (e, stack) {
         final clientErrorStatusCode = e.clientErrorStatusCode;
         if (clientErrorStatusCode != null) {
-          print([e, Trace.from(stack).terse].join('\n'));
+          print(
+            [
+              if (e.innerError != null) e.innerError!,
+              if (e.innerStack != null) Trace.from(e.innerStack!).terse,
+              e,
+              Trace.from(stack).terse,
+            ].join('\n'),
+          );
           return Response(
             clientErrorStatusCode,
             body: 'Bad request! Check the `x-cloud-trace-context` response '
