@@ -98,7 +98,7 @@ firebase.analytics();
 
     if (request.requestedUri.isScheme('https')) {
       final token = await _jwtFromRequest(request);
-      print(prettyJson(token));
+      print(prettyJson(token.claims));
     } else {
       print('* Allowing local request to ${request.requestedUri}');
     }
