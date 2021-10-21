@@ -20,10 +20,17 @@ class VoteService {
 
   String get _projectId => config.projectId;
 
+  final _store = JsonWebKeyStore();
+
   VoteService({
     required ElectionStorage storage,
     required this.config,
-  }) : _storage = storage;
+    required Iterable<Uri> keySetUrls,
+  }) : _storage = storage {
+    for (var uri in keySetUrls) {
+      _store.addKeySetUrl(uri);
+    }
+  }
 
   @Route.get('/api/config.js')
   Response getConfig(Request request) => Response.ok(
@@ -141,22 +148,6 @@ firebase.analytics();
 
     return jwt;
   }
-
-  final _store = JsonWebKeyStore()
-    ..addKeySetUrl(
-      Uri.parse(
-        'https://www.googleapis.com/service_accounts/v1/jwk/securetoken@system.gserviceaccount.com',
-      ),
-    )
-    // TODO: should be getting this from
-    //  https://accounts.google.com/.well-known/openid-configuration
-    //  via jwks_uri – per https://openid.net/specs/openid-connect-discovery-1_0.html#ProviderConfig
-    // Feature request for pkg:jose:https://github.com/appsup-dart/jose/issues/32
-    ..addKeySetUrl(
-      Uri.parse(
-        'https://www.googleapis.com/oauth2/v3/certs',
-      ),
-    );
 }
 
 Response _okJsonResponse(Object json) => Response.ok(
