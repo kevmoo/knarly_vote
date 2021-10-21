@@ -202,7 +202,10 @@ class FirestoreElectionStorage implements ElectionStorage {
       );
       print(prettyJson(resultTask));
     } else {
-      final result = await _client.post(Uri.parse(updateUri));
+      final result = await _client.post(
+        Uri.parse(updateUri),
+        headers: {'x-cloudtasks-queuename': config.electionUpdateTaskQueueId},
+      );
       print(['Did a local update', result.statusCode, result.body].join('\t'));
     }
   }

@@ -11,6 +11,8 @@ class ServiceException implements Exception {
 
   int? get clientErrorStatusCode {
     switch (kind) {
+      case ServiceExceptionKind.badUpdateRequest:
+        return 400;
       case ServiceExceptionKind.firebaseTokenValidation:
         return 401;
       case ServiceExceptionKind.resourceNotFound:
@@ -29,4 +31,8 @@ enum ServiceExceptionKind {
   /// Client tried to access an entity that does not exist or that does exist
   /// but the client does not have access to. - HTTP 404
   resourceNotFound,
+
+  /// Received a bad request on an update endpoint that should be accessed via
+  /// pub-sub.
+  badUpdateRequest,
 }

@@ -4,9 +4,9 @@ import 'package:jose/jose.dart';
 import 'package:shelf/shelf.dart';
 import 'package:shelf_jwt_auth/shelf_jwt_auth.dart';
 import 'package:shelf_router/shelf_router.dart';
+import 'package:stack_trace/stack_trace.dart';
 
 import 'election_storage.dart';
-import 'firestore_election_storage.dart';
 import 'service_config.dart';
 import 'service_exception.dart';
 import 'shared.dart';
@@ -90,27 +90,26 @@ firebase.analytics();
 
     final queueName = request.headers[queueNameHeader];
 
-    if (queueName == null) {
-      // TODO: this should be an error!
-      print('Missing the $queueNameHeader!');
-    } else if (queueName != config.electionUpdateTaskQueueId) {
-      // TODO: this should be an error!
-      print(
+    if (queueName != config.electionUpdateTaskQueueId) {
+      throw ServiceException(
+        ServiceExceptionKind.badUpdateRequest,
         'We have the wrong task queue. Got "$queueName", expected '
         '"${config.electionUpdateTaskQueueId}"',
       );
     }
 
     try {
-      final jwt = await _jwtFromRequest(request);
-      print(prettyJson(jwt.claims));
-    } catch (e) {
+      await _jwtFromRequest(request);
+    } catch (e, stack) {
       // TODO: this should be an error!
       print(
         [
           '--',
           'Could not validate the authorization header',
           '--',
+          e.runtimeType,
+          e,
+          Trace.from(stack).terse,
         ].join('\n'),
       );
       debugPrintRequestHeaders(request);

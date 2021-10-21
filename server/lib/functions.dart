@@ -1,5 +1,6 @@
 import 'package:functions_framework/functions_framework.dart';
 import 'package:shelf/shelf.dart';
+import 'package:stack_trace/stack_trace.dart';
 
 import 'src/firestore_election_storage.dart';
 import 'src/header_access_middleware.dart';
@@ -52,15 +53,16 @@ Handler _middleware(Handler innerHandler) => (Request request) async {
         }
 
         return response;
-      } on ServiceException catch (e) {
+      } on ServiceException catch (e, stack) {
         final clientErrorStatusCode = e.clientErrorStatusCode;
         if (clientErrorStatusCode != null) {
-          return Response(clientErrorStatusCode, body: e.message);
+          print([e, Trace.from(stack).terse].join('\n'));
+          return Response(
+            clientErrorStatusCode,
+            body: 'Bad request! Check the `x-cloud-trace-context` response '
+                'header in the server logs to learn more.',
+          );
         }
-        rethrow;
-      } catch (e, stack) {
-        print(e);
-        print(stack);
         rethrow;
       }
     };
