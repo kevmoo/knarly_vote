@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:provider/provider.dart';
-import 'package:routemaster/routemaster.dart';
 
 import '../auth_model.dart';
+import '../routing.dart';
 import 'network_async_widget.dart';
 
 class ElectionListWidget extends StatelessWidget {
@@ -40,7 +40,7 @@ class ElectionListWidget extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
-                        onPressed: () => Routemaster.of(context).push(item.id),
+                        onPressed: () => context.pushViewElection(item.id),
                         child: Text(item.name),
                       ),
                     ),

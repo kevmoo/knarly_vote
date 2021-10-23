@@ -1,11 +1,13 @@
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart' show User;
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import 'package:routemaster/routemaster.dart';
 import 'package:url_launcher/link.dart';
 
 import 'src/auth_model.dart';
-import 'src/observer.dart';
+import 'src/routing.dart';
 import 'src/shared.dart';
 import 'src/theme_data.dart';
 import 'src/widgets/auth_widget.dart';
@@ -27,59 +29,86 @@ class _KnarlyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) => AuthWidget(
         child: Consumer<FirebaseAuthModel>(
-          builder: (context, authModel, _) => MaterialApp.router(
-            title: siteTitle,
-            theme: themeData,
-            routerDelegate: RoutemasterDelegate(
-              routesBuilder: (context) {
-                final user = authModel.user;
-                if (user == null) {
-                  return _loggedOutRouteMap;
-                }
-
-                return _loggedInRouteMap(user);
-              },
-              observers: [observer],
-            ),
-            routeInformationParser: const RoutemasterParser(),
-          ),
+          builder: (context, authModel, _) {
+            final router = _router(authModel.user);
+            return MaterialApp.router(
+              title: siteTitle,
+              theme: themeData,
+              routerDelegate: router.routerDelegate,
+              routeInformationParser: router.routeInformationParser,
+            );
+          },
         ),
       );
 
-  late final _loggedOutRouteMap = RouteMap(
-    onUnknownRoute: (route) => const Redirect('/'),
-    routes: {
-      '/': (_) => _scaffold(
-            name: 'Sign-in',
-            key: _rootKey,
-            child: const RootWidget(),
-          )
+  GoRouter _router(User? user) {
+    if (user == null) {
+      return _loggedOutRouter;
+    }
+    return _loggedInRouteMap(user);
+  }
+
+  late final _loggedOutRouter = GoRouter(
+    routes: [
+      GoRoute(
+        path: '/',
+        pageBuilder: (context, state) => _scaffold(
+          name: 'Sign-in',
+          key: _rootKey,
+          child: const RootWidget(),
+        ),
+      ),
+    ],
+    redirect: (state) {
+      if (state.location == '/') return null;
+      return '/';
     },
+    errorPageBuilder: _errorPageBuilder,
+    observers: _observers,
   );
 
-  RouteMap _loggedInRouteMap(User user) => RouteMap(
-        onUnknownRoute: (route) {
-          print('logged in route unknown! $route');
-          return const Redirect('/elections');
-        },
-        routes: {
-          '/elections': (_) => _scaffoldSignedIn(
-                name: 'List Elections',
-                key: ObjectKey('${user.uid}-election-list'),
-                user: user,
-                child: const ElectionListWidget(),
-              ),
-          '/elections/:id': (route) {
-            final electionId = route.pathParameters['id'];
-            return _scaffoldSignedIn(
-              name: 'Show Election - $electionId',
-              key: ObjectKey('${user.uid}-election-show'),
+  GoRouter _loggedInRouteMap(User user) => GoRouter(
+        routes: [
+          GoRoute(path: '/', redirect: (_) => '/elections'),
+          GoRoute(
+            path: '/elections',
+            pageBuilder: (a, b) => _scaffoldSignedIn(
+              name: 'List Elections',
+              key: ObjectKey('${user.uid}-election-list'),
               user: user,
-              child: ElectionShowWidget(electionId!),
-            );
-          },
-        },
+              child: const ElectionListWidget(),
+            ),
+            routes: [
+              GoRoute(
+                name: ContextExtensions.viewElectionRoutName,
+                path: ':${ContextExtensions.viewElectionIdParamName}',
+                pageBuilder: (context, state) {
+                  final electionId =
+                      state.params[ContextExtensions.viewElectionIdParamName]!;
+                  return _scaffoldSignedIn(
+                    name: 'Show Election - $electionId',
+                    key: ObjectKey('${user.uid}-election-show'),
+                    user: user,
+                    child: ElectionShowWidget(electionId),
+                  );
+                },
+              )
+            ],
+          ),
+        ],
+        errorPageBuilder: _errorPageBuilder,
+        observers: _observers,
       );
+
+  Page<dynamic> _errorPageBuilder(
+    BuildContext context,
+    GoRouterState state,
+  ) =>
+      MaterialPage<void>(key: state.pageKey, child: const Text('Boo...'));
+
+  final _observers = [
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics())
+  ];
 
   MaterialPage _scaffoldSignedIn({
     required String name,
