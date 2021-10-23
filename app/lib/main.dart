@@ -96,7 +96,12 @@ class _KnarlyApp extends StatelessWidget {
             ],
           ),
         ],
-        errorPageBuilder: _errorPageBuilder,
+        errorPageBuilder: (context, state) => _scaffoldSignedIn(
+          name: 'Bad path',
+          user: user,
+          child: Text('Unknown page ${state.location}'),
+          key: const ObjectKey('bad page'),
+        ),
         observers: _observers,
       );
 
