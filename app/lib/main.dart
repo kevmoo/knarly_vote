@@ -35,13 +35,13 @@ class _KnarlyApp extends StatelessWidget {
           builder: (context, data) => MaterialApp.router(
             title: siteTitle,
             theme: themeData,
-            routerDelegate: _loggedOutRouter.routerDelegate,
-            routeInformationParser: _loggedOutRouter.routeInformationParser,
+            routerDelegate: _router.routerDelegate,
+            routeInformationParser: _router.routeInformationParser,
           ),
         ),
       );
 
-  late final _loggedOutRouter = GoRouter(
+  late final _router = GoRouter(
     routes: [
       GoRoute(
         path: '/',
