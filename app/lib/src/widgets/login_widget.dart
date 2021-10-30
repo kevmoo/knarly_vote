@@ -5,9 +5,9 @@ import 'package:go_router/go_router.dart';
 
 import '../shared.dart';
 
-class RootWidget extends StatelessWidget {
+class LoginWidget extends StatelessWidget {
   final String? from;
-  const RootWidget({this.from, Key? key}) : super(key: key);
+  const LoginWidget({this.from, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Column(

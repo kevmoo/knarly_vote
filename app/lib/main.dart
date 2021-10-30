@@ -12,8 +12,8 @@ import 'src/shared.dart';
 import 'src/theme_data.dart';
 import 'src/widgets/election_list_widget.dart';
 import 'src/widgets/election_show_widget.dart';
+import 'src/widgets/login_widget.dart';
 import 'src/widgets/network_async_widget.dart';
-import 'src/widgets/root_widget.dart';
 
 Future<void> main() async {
   runApp(_KnarlyApp());
@@ -48,7 +48,7 @@ class _KnarlyApp extends StatelessWidget {
         pageBuilder: (context, state) => _scaffold(
           name: 'Sign-in',
           key: state.pageKey,
-          child: RootWidget(from: state.queryParams['from']),
+          child: LoginWidget(from: state.queryParams['from']),
         ),
       ),
       GoRoute(
