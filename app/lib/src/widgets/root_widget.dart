@@ -1,11 +1,13 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../shared.dart';
 
 class RootWidget extends StatelessWidget {
-  const RootWidget({Key? key}) : super(key: key);
+  final String? from;
+  const RootWidget({this.from, Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) => Column(
@@ -14,7 +16,10 @@ class RootWidget extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(20),
             child: ElevatedButton(
-              onPressed: _onSignIn,
+              onPressed: () async {
+                await _onSignIn();
+                if (from != null) context.go(from!);
+              },
               child: const Text('Sign in with your Google account'),
             ),
           ),
