@@ -1,0 +1,9 @@
+# See https://github.com/google/mono_repo.dart for details on this file
+sdk:
+- stable
+
+stages:
+- analyze_and_format:
+  - group:
+    - format
+    - analyze: --fatal-infos .
