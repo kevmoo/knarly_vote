@@ -6,7 +6,7 @@ environment:
 dependencies:
   args: ^2.0.0
   functions_framework: ^0.4.1
-  googleapis: ^6.0.0
+  googleapis: ^7.0.0
   googleapis_auth: ^1.1.0
   http: ^0.13.3
   jose: ^0.3.0
