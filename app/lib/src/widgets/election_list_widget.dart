@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:knarly_common/knarly_common.dart';
 import 'package:provider/provider.dart';
 
@@ -40,7 +41,8 @@ class ElectionListWidget extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: ElevatedButton(
-                        onPressed: () => context.pushViewElection(item.id),
+                        onPressed: () =>
+                            context.push(ElectionViewRoute(item.id).location),
                         child: Text(item.name),
                       ),
                     ),
