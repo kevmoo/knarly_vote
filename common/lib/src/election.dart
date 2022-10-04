@@ -36,12 +36,12 @@ class ElectionPreview extends _ElectionCore {
   final int ballotCount;
 
   ElectionPreview({
-    required String id,
-    required String name,
+    required super.id,
+    required super.name,
     required this.userVoted,
     required this.ballotCount,
-    String? description,
-  }) : super(id: id, name: name, description: description);
+    super.description,
+  });
 
   factory ElectionPreview.fromJson(Map<String, dynamic> json) =>
       _$ElectionPreviewFromJson(json);
@@ -55,14 +55,13 @@ class Election extends _ElectionCore {
   final Set<String> candidates;
 
   Election({
-    required String id,
-    required String name,
+    required super.id,
+    required super.name,
     required Set<String> candidates,
-    String? description,
-  })  : candidates = Set.unmodifiable(
+    super.description,
+  }) : candidates = Set.unmodifiable(
           candidates.toList()..sort(compareAsciiLowerCaseNatural),
-        ),
-        super(id: id, name: name, description: description) {
+        ) {
     _validCandidates(candidates, 'candidates');
   }
 

@@ -56,7 +56,7 @@ class _VoteWidgetState extends State<VoteWidget> {
               'Check out the dev console. Reload?',
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                color: Theme.of(context).errorColor,
+                color: Theme.of(context).colorScheme.error,
               ),
             ),
           ),
