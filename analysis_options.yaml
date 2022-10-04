@@ -1,6 +1,6 @@
 analyzer:
-  strong-mode:
-    implicit-casts: false
+  language:
+    strict-casts: true
 
 linter:
   rules:
@@ -32,7 +32,6 @@ linter:
     - camel_case_extensions
     - camel_case_types
     - cancel_subscriptions
-    #- cascade_invocations
     - comment_references
     - constant_identifier_names
     - control_flow_in_finally
@@ -122,5 +121,6 @@ linter:
     - use_is_even_rather_than_modulo
     - use_rethrow_when_possible
     - use_string_buffers
+    - use_super_parameters
     - valid_regexps
     - void_checks

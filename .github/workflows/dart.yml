@@ -1,4 +1,4 @@
-# Created with package:mono_repo v6.3.0
+# Created with package:mono_repo v6.4.1
 name: Dart CI
 on:
   push:
@@ -21,20 +21,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:stable"
           restore-keys: |
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: stable
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - name: mono_repo self validate
-        run: dart pub global activate mono_repo 6.3.0
+        run: dart pub global activate mono_repo 6.4.1
       - name: mono_repo self validate
         run: dart pub global run mono_repo generate --validate
   job_002:
@@ -42,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:common-server-shelf_jwt_auth;commands:format-analyze"
@@ -51,56 +53,58 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: common_pub_upgrade
         name: common; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: common
-        run: dart pub upgrade
       - name: "common; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
-        working-directory: common
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "common; dart analyze --fatal-infos ."
         if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
         working-directory: common
+      - name: "common; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
+        working-directory: common
       - id: server_pub_upgrade
         name: server; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: server
-        run: dart pub upgrade
       - name: "server; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.server_pub_upgrade.conclusion == 'success'"
-        working-directory: server
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "server; dart analyze --fatal-infos ."
         if: "always() && steps.server_pub_upgrade.conclusion == 'success'"
         working-directory: server
+      - name: "server; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.server_pub_upgrade.conclusion == 'success'"
+        working-directory: server
       - id: shelf_jwt_auth_pub_upgrade
         name: shelf_jwt_auth; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: shelf_jwt_auth
-        run: dart pub upgrade
       - name: "shelf_jwt_auth; dart format --output=none --set-exit-if-changed ."
-        if: "always() && steps.shelf_jwt_auth_pub_upgrade.conclusion == 'success'"
-        working-directory: shelf_jwt_auth
         run: "dart format --output=none --set-exit-if-changed ."
-      - name: "shelf_jwt_auth; dart analyze --fatal-infos ."
         if: "always() && steps.shelf_jwt_auth_pub_upgrade.conclusion == 'success'"
         working-directory: shelf_jwt_auth
+      - name: "shelf_jwt_auth; dart analyze --fatal-infos ."
         run: dart analyze --fatal-infos .
+        if: "always() && steps.shelf_jwt_auth_pub_upgrade.conclusion == 'success'"
+        working-directory: shelf_jwt_auth
   job_003:
     name: "ensure_build; PKG: common; `dart test --run-skipped -t presubmit-only test/ensure_build_test.dart`"
     runs-on: ubuntu-latest
     steps:
       - name: Cache Pub hosted dependencies
-        uses: actions/cache@4504faf7e9bcf8f3ed0bc863c4e1d21499ab8ef8
+        uses: actions/cache@ac8075791e805656e71b4ba23325ace9e3421120
         with:
           path: "~/.pub-cache/hosted"
           key: "os:ubuntu-latest;pub-cache-hosted;sdk:dev;packages:common;commands:test"
@@ -109,20 +113,22 @@ jobs:
             os:ubuntu-latest;pub-cache-hosted;sdk:dev
             os:ubuntu-latest;pub-cache-hosted
             os:ubuntu-latest
-      - uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
+      - name: Setup Dart SDK
+        uses: dart-lang/setup-dart@6a218f2413a3e78e9087f638a238f6b40893203d
         with:
           sdk: dev
       - id: checkout
-        uses: actions/checkout@d0651293c4a5a52e711f25b41b05b2212f385d28
+        name: Checkout repository
+        uses: actions/checkout@2541b1294d2704b0964813337f33b291d3f8596b
       - id: common_pub_upgrade
         name: common; dart pub upgrade
+        run: dart pub upgrade
         if: "always() && steps.checkout.conclusion == 'success'"
         working-directory: common
-        run: dart pub upgrade
       - name: "common; dart test --run-skipped -t presubmit-only test/ensure_build_test.dart"
+        run: dart test --run-skipped -t presubmit-only test/ensure_build_test.dart
         if: "always() && steps.common_pub_upgrade.conclusion == 'success'"
         working-directory: common
-        run: dart test --run-skipped -t presubmit-only test/ensure_build_test.dart
     needs:
       - job_001
       - job_002

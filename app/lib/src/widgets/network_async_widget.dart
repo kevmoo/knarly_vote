@@ -48,7 +48,7 @@ Url: ${error.uri}''';
             return SelectableText(
               text,
               textScaleFactor: 1.4,
-              style: TextStyle(color: Theme.of(context).errorColor),
+              style: TextStyle(color: Theme.of(context).colorScheme.error),
             );
           }
 
