@@ -19,6 +19,7 @@ import 'package:test/test.dart';
 void main() {
   test(
     'ensure_build',
+    timeout: const Timeout.factor(2),
     () => expectBuildClean(
       packageRelativeDirectory: 'common',
     ),
