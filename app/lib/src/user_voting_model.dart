@@ -89,7 +89,7 @@ class UserVotingModel extends ChangeNotifier {
 
     final newRank = _voteModel?.rank.toList();
 
-    FirebaseAnalytics().logEvent(
+    FirebaseAnalytics.instance.logEvent(
       name: 'ballot updated',
       parameters: {'election_id': _election.id},
     ).ignore();

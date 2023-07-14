@@ -137,7 +137,7 @@ Widget _buildLists(BuildContext _, VoteModel<String> model, __) => Row(
               ),
             ],
           ),
-        )
+        ),
       ],
     );
 
@@ -171,13 +171,13 @@ Widget _rankList(VoteModel<String> model, Iterable<String> items) =>
                       tooltip: 'Remove',
                       onPressed: () => model.removeCandidate(item),
                     ),
-                    const SizedBox(width: 10)
+                    const SizedBox(width: 10),
                   ],
                 ),
               ),
             ),
             onDoubleTap: () => model.removeCandidate(item),
-          )
+          ),
       ],
     );
 
@@ -198,7 +198,7 @@ Widget _remainingOptions(VoteModel<String> model, Iterable<String> items) =>
               ),
             ),
             onDoubleTap: () => model.addCandidate(item),
-          )
+          ),
       ],
     );
 
@@ -225,8 +225,7 @@ Widget _valueProviderConsumer<T extends ChangeNotifier>({
     BuildContext context,
     T value,
     Widget? child,
-  )
-      builder,
+  ) builder,
 }) =>
     ChangeNotifierProvider<T>.value(
       value: value,

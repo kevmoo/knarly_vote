@@ -20,16 +20,11 @@ class ServiceException implements Exception {
         message,
       );
 
-  int? get clientErrorStatusCode {
-    switch (kind) {
-      case ServiceExceptionKind.badUpdateRequest:
-        return 400;
-      case ServiceExceptionKind.authorizationTokenValidation:
-        return 401;
-      case ServiceExceptionKind.resourceNotFound:
-        return 404;
-    }
-  }
+  int get clientErrorStatusCode => switch (kind) {
+        ServiceExceptionKind.badUpdateRequest => 400,
+        ServiceExceptionKind.authorizationTokenValidation => 401,
+        ServiceExceptionKind.resourceNotFound => 404
+      };
 
   @override
   String toString() => 'ServiceException ($kind): $message';

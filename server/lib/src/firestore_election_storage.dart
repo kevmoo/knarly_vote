@@ -194,8 +194,9 @@ class FirestoreElectionStorage implements ElectionStorage {
               headers: traceParent == null
                   ? null
                   : {
-                      traceParentHeaderName:
-                          TraceContext.parse(traceParent).randomize().toString()
+                      traceParentHeaderName: TraceContext.parse(traceParent)
+                          .randomize()
+                          .toString(),
                     },
             ),
           ),

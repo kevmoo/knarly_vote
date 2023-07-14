@@ -6,16 +6,17 @@ environment:
   sdk: ">=2.16.0 <3.0.0"
 
 dependencies:
-  cloud_firestore: ^2.2.2
-  firebase_analytics: ^8.3.2
-  firebase_auth: ^3.0.1
+  cloud_firestore: any #^2.2.2
+  firebase_analytics: ^9.3.8
+  firebase_auth: any #^3.0.1
+  firebase_core: any
   flutter:
     sdk: flutter
   flutter_web_plugins:
     sdk: flutter
 
   go_router: ^3.0.0
-  http: ^0.13.0
+  http: ^1.0.0
   knarly_common:
     path: ../common
   provider: ^6.0.0

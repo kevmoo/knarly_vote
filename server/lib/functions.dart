@@ -55,21 +55,18 @@ Handler _middleware(Handler innerHandler) => (Request request) async {
         return response;
       } on ServiceException catch (e, stack) {
         final clientErrorStatusCode = e.clientErrorStatusCode;
-        if (clientErrorStatusCode != null) {
-          print(
-            [
-              if (e.innerError != null) e.innerError!,
-              if (e.innerStack != null) Trace.from(e.innerStack!).terse,
-              e,
-              Trace.from(stack).terse,
-            ].join('\n'),
-          );
-          return Response(
-            clientErrorStatusCode,
-            body: 'Bad request! Check the `x-cloud-trace-context` response '
-                'header in the server logs to learn more.',
-          );
-        }
-        rethrow;
+        print(
+          [
+            if (e.innerError != null) e.innerError!,
+            if (e.innerStack != null) Trace.from(e.innerStack!).terse,
+            e,
+            Trace.from(stack).terse,
+          ].join('\n'),
+        );
+        return Response(
+          clientErrorStatusCode,
+          body: 'Bad request! Check the `x-cloud-trace-context` response '
+              'header in the server logs to learn more.',
+        );
       }
     };

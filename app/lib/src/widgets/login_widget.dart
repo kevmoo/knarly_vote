@@ -38,7 +38,7 @@ class LoginWidget extends StatelessWidget {
                 ),
               ],
             ),
-          )
+          ),
         ],
       );
 
@@ -46,7 +46,7 @@ class LoginWidget extends StatelessWidget {
     try {
       final googleProvider = GoogleAuthProvider()..addScope('email');
       await FirebaseAuth.instance.signInWithPopup(googleProvider);
-      FirebaseAnalytics().logLogin(loginMethod: 'google').ignore();
+      FirebaseAnalytics.instance.logLogin(loginMethod: 'google').ignore();
     } catch (error) {
       print('Error caught during Firebase sign-in: $error');
     }

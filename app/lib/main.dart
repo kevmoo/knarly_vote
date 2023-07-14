@@ -1,5 +1,4 @@
 import 'package:firebase_analytics/firebase_analytics.dart';
-import 'package:firebase_analytics/observer.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -67,7 +66,7 @@ class _KnarlyApp extends StatelessWidget {
                       onPressed: _onSignOut,
                       child: const Icon(Icons.logout),
                     ),
-                  )
+                  ),
                 ],
               ),
       );
@@ -84,7 +83,7 @@ class _KnarlyApp extends StatelessWidget {
       );
 
   final _observers = [
-    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics())
+    FirebaseAnalyticsObserver(analytics: FirebaseAnalytics.instance),
   ];
 
   Future<void> _onSignOut() async {
