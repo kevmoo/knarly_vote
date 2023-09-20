@@ -3,10 +3,10 @@ import 'dart:typed_data';
 
 class TraceContext {
   final String traceId;
-  final String parentId;
+  final String spaceId;
   final String traceFlags;
 
-  TraceContext._(this.traceId, this.parentId, this.traceFlags);
+  TraceContext._(this.traceId, this.spaceId, this.traceFlags);
 
   factory TraceContext.parse(String input) {
     final sections = input.split('-');
@@ -25,7 +25,9 @@ class TraceContext {
     );
   }
 
-  /// Returns a new [TraceContext] with a randomized [parentId].
+  /// Returns a new [TraceContext] with a randomized [spaceId].
+  ///
+  /// If [random] is not provided a new instance of [Random] is used.
   TraceContext randomize({Random? random}) {
     random ??= Random();
 
@@ -46,7 +48,7 @@ class TraceContext {
   }
 
   @override
-  String toString() => '00-$traceId-$parentId-$traceFlags';
+  String toString() => '00-$traceId-$spaceId-$traceFlags';
 }
 
 final _hexThing = RegExp(r'^(?:[0-9a-f][0-9a-f])+$');

@@ -76,7 +76,7 @@ void main() {
         final randomized = value.randomize();
         expect(randomized.traceId, value.traceId);
         expect(randomized.traceFlags, value.traceFlags);
-        expect(randomized.parentId, isNot(value.parentId));
+        expect(randomized.spaceId, isNot(value.spaceId));
         expect(
           TraceContext.parse(randomized.toString()).toString(),
           randomized.toString(),
